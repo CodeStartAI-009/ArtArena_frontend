@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5090",
+  baseURL: "https://art-arena-frontend-krr6.vercel.app/",
 });
 
 API.interceptors.request.use(config => {

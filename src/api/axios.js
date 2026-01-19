@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5090", // backend URL
+  baseURL: "https://art-arena-frontend-krr6.vercel.app/", // backend URL
   withCredentials: true,
 });
 

@@ -5,7 +5,7 @@ let socket;
 
 export function getSocket() {
   if (!socket) {
-    socket = io("http://localhost:5090", {
+    socket = io("https://art-arena-frontend-krr6.vercel.app/", {
       transports: ["websocket"],
       autoConnect: false, // 🔒 IMPORTANT
       withCredentials: true,
