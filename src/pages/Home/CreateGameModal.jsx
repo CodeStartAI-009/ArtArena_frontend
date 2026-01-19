@@ -1,0 +1,220 @@
+import "./CreateGameModal.css";
+import { useState } from "react";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaTimes,
+  FaQuestionCircle,
+} from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import ThemeSelectorModal from "./ThemeSelector";
+import themes from "./themes";
+import { createRoom } from "../../api/room.api";
+
+/* ================= CONSTANTS ================= */
+const MODES = ["Classic", "Quick", "Kids", "Together"];
+const GAMEPLAY = ["Score", "Timer", "Drawing", "Open-canvas"];
+const TIMERS = ["20 sec", "30 sec", "40 sec"];
+const SCORES = [5, 10, 15, 30];
+const ROUNDS = [2, 5, 8, 10, 15];
+const MAX_PLAYERS = [2, 3, 4, 6, 8];
+
+export default function CreateGameModal({ onClose }) {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  /* ================= STATE ================= */
+  const [mode, setMode] = useState(0);
+  const [gameplay, setGameplay] = useState(0);
+  const [timer, setTimer] = useState(1);
+  const [score, setScore] = useState(1);
+  const [rounds, setRounds] = useState(1);
+  const [players, setPlayers] = useState(2);
+
+  const [theme, setTheme] = useState("random");
+  const [showThemeModal, setShowThemeModal] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+
+  /* ================= DERIVED ================= */
+  const selectedMode = MODES[mode];
+  const selectedGameplay = GAMEPLAY[gameplay];
+
+  const isQuick = selectedMode === "Quick";
+  const isKids = selectedMode === "Kids";
+
+  const themeName =
+    themes.find(t => t.id === theme)?.name || "Random";
+
+  const cycle = (list, index, dir) =>
+    (index + dir + list.length) % list.length;
+
+  /* ================= CREATE ================= */
+  const handleCreate = async () => {
+    if (loading) return;
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        mode: selectedMode,
+        gameplay: isQuick ? "Timer" : selectedGameplay,
+        timer: TIMERS[timer],
+        score:
+          selectedGameplay === "Score" && !isQuick
+            ? SCORES[score]
+            : null,
+        totalRounds: isKids ? null : ROUNDS[rounds],
+        maxPlayers: isKids ? 2 : MAX_PLAYERS[players],
+        theme,
+        isPrivate: true,
+      };
+
+      const res = await createRoom(payload);
+      navigate(`/lobby/${res.data.room.code}`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create room");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ================= UI ================= */
+  return (
+    <>
+      <div className="create-backdrop">
+        <div className="create-modal">
+          <button className="close-btn" onClick={onClose}>
+            <FaTimes />
+          </button>
+
+          <h2>Create Private Game</h2>
+          <p className="subtitle">Private games do NOT award XP</p>
+
+          {/* MODE */}
+          <Row
+            label={
+              <>
+                Mode
+                <FaQuestionCircle
+                  className="info-icon"
+                  onClick={() => setShowInfo(!showInfo)}
+                />
+              </>
+            }
+            value={selectedMode}
+            onLeft={() => setMode(cycle(MODES, mode, -1))}
+            onRight={() => setMode(cycle(MODES, mode, 1))}
+          />
+
+          {showInfo && (
+            <div className="mode-info">
+              {selectedMode === "Classic" && "Score or Timer"}
+              {selectedMode === "Quick" && "Fast timer-based rounds"}
+              {selectedMode === "Kids" && "Simplified, max 2 players"}
+            </div>
+          )}
+
+          {/* GAMEPLAY */}
+          {!isQuick && !isKids && (
+            <Row
+              label="Gameplay"
+              value={selectedGameplay}
+              onLeft={() =>
+                setGameplay(cycle(GAMEPLAY, gameplay, -1))
+              }
+              onRight={() =>
+                setGameplay(cycle(GAMEPLAY, gameplay, 1))
+              }
+            />
+          )}
+
+          {/* TIMER */}
+          {(selectedGameplay === "Timer" || isQuick) && (
+            <Row
+              label="Round Timer"
+              value={TIMERS[timer]}
+              onLeft={() => setTimer(cycle(TIMERS, timer, -1))}
+              onRight={() => setTimer(cycle(TIMERS, timer, 1))}
+            />
+          )}
+
+          {/* SCORE */}
+          {selectedGameplay === "Score" && !isQuick && !isKids && (
+            <Row
+              label="Max Score"
+              value={SCORES[score]}
+              onLeft={() => setScore(cycle(SCORES, score, -1))}
+              onRight={() => setScore(cycle(SCORES, score, 1))}
+            />
+          )}
+
+          {/* ROUNDS */}
+          {!isKids && (
+            <Row
+              label="Total Rounds"
+              value={ROUNDS[rounds]}
+              onLeft={() => setRounds(cycle(ROUNDS, rounds, -1))}
+              onRight={() => setRounds(cycle(ROUNDS, rounds, 1))}
+            />
+          )}
+
+          {/* PLAYERS */}
+          <Row
+            label="Max Players"
+            value={isKids ? 2 : MAX_PLAYERS[players]}
+            onLeft={() =>
+              !isKids &&
+              setPlayers(cycle(MAX_PLAYERS, players, -1))
+            }
+            onRight={() =>
+              !isKids &&
+              setPlayers(cycle(MAX_PLAYERS, players, 1))
+            }
+          />
+
+          {/* THEME */}
+          <div className="row">
+            <span className="row-label">Arena</span>
+            <div
+              className="row-control clickable"
+              onClick={() => setShowThemeModal(true)}
+            >
+              <span>{themeName}</span>
+            </div>
+          </div>
+
+          <button className="play-btn" onClick={handleCreate}>
+            {loading ? "Creating..." : "Create"}
+          </button>
+        </div>
+      </div>
+
+      {showThemeModal && (
+        <ThemeSelectorModal
+          value={theme}
+          onSelect={setTheme}
+          onClose={() => setShowThemeModal(false)}
+        />
+      )}
+    </>
+  );
+}
+
+/* ================= ROW ================= */
+function Row({ label, value, onLeft, onRight }) {
+  return (
+    <div className="row">
+      <span className="row-label">{label}</span>
+      <div className="row-control">
+        <button onClick={onLeft}>
+          <FaChevronLeft />
+        </button>
+        <span>{value}</span>
+        <button onClick={onRight}>
+          <FaChevronRight />
+        </button>
+      </div>
+    </div>
+  );
+}

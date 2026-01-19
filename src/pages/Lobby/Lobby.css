@@ -1,0 +1,195 @@
+/* ================= ROOT ================= */
+
+.lobby-root {
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* OVERLAY */
+.lobby-root::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.45) 70%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  z-index: 0;
+}
+
+/* ================= HEADER ================= */
+
+.lobby-header {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: linear-gradient(180deg, #3c7df0, #2456b5);
+  padding: 14px 32px;
+  border-radius: 22px;
+  color: white;
+  font-weight: 900;
+  z-index: 2;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.25),
+    0 14px 35px rgba(0,0,0,0.45);
+}
+
+.lobby-mode {
+  font-size: 18px;
+}
+
+.lobby-code {
+  font-size: 14px;
+  color: #ffe16a;
+  opacity: 0.95;
+}
+
+/* ================= PLAYERS PANEL ================= */
+
+.players-panel {
+  position: absolute;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 380px;
+  background: linear-gradient(
+    180deg,
+    rgba(35, 65, 120, 0.9),
+    rgba(20, 40, 80, 0.9)
+  );
+  border-radius: 26px;
+  padding: 20px 18px 22px;
+  color: white;
+  z-index: 2;
+  backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.15),
+    0 30px 70px rgba(0,0,0,0.6);
+}
+
+.players-panel h3 {
+  text-align: center;
+  margin-bottom: 14px;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 0.4px;
+}
+
+/* ================= PLAYER ROW ================= */
+
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.18),
+    rgba(255,255,255,0.08)
+  );
+  padding: 12px 16px;
+  border-radius: 16px;
+  margin-bottom: 10px;
+  font-weight: 800;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    0 6px 14px rgba(0,0,0,0.35);
+}
+
+.player-row.online {
+  opacity: 1;
+}
+
+.player-row.offline {
+  opacity: 0.55;
+  filter: grayscale(0.4);
+}
+
+.player-index {
+  background: linear-gradient(180deg, #ffe16a, #ffb703);
+  color: black;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.5),
+    0 4px 8px rgba(0,0,0,0.4);
+}
+
+.player-name {
+  flex: 1;
+}
+
+.player-status {
+  font-size: 12px;
+  opacity: 0.85;
+  font-style: italic;
+}
+
+/* ================= FOOTER ================= */
+
+.lobby-footer {
+  position: absolute;
+  bottom: 26px;
+  width: 100%;
+  text-align: center;
+  color: white;
+  font-size: 18px;
+  font-weight: 900;
+  z-index: 2;
+  text-shadow: 0 6px 16px rgba(0,0,0,0.7);
+  letter-spacing: 0.4px;
+}
+
+/* ================= COUNTDOWN ================= */
+
+.countdown {
+  font-size: 22px;
+  animation: pulse 1s infinite;
+}
+
+.start-hint {
+  opacity: 0.9;
+}
+
+.waiting-text {
+  opacity: 0.75;
+}
+
+.starting-text {
+  opacity: 0.85;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* ================= LOADING ================= */
+
+.lobby-loading {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0b1220;
+  color: white;
+  font-size: 20px;
+  font-weight: 900;
+}

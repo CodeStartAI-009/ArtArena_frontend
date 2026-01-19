@@ -1,0 +1,86 @@
+.splash-root {
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(180deg, #0b4fa3, #083a78);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-family: system-ui, sans-serif;
+  }
+  
+  .splash-center {
+    text-align: center;
+  }
+  
+  .splash-title {
+    width: 300px;
+    max-width: 80%;
+    margin-bottom: 28px;
+  }
+  
+  /* BUTTONS */
+  .splash-buttons {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .store-btn {
+    height: 48px;
+  }
+  
+  .discord-icon {
+    width: 42px;
+    height: 42px;
+    transition: transform 0.15s ease;
+  }
+  
+  .discord-icon:hover {
+    transform: scale(1.05);
+  }
+/* BOTTOM LEFT */
+.splash-bottom-left {
+    position: absolute;
+    bottom: 32px;
+    left: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 18px; /* ⬆ text size */
+  }
+  
+  .art-loader {
+    width: 74px;   /* ⬆ larger icon */
+    height: 74px;
+    animation: float 1.2s ease-in-out infinite;
+  }
+  
+  /* BOTTOM RIGHT */
+  .splash-bottom-right {
+    position: absolute;
+    bottom: 42px;
+    right: 42px;
+  }
+  
+  .splash-bottom-right img {
+    height: 56px;  /* ⬆ much larger logo */
+    opacity: 1;
+  }
+  
+  /* ANIMATION */
+  @keyframes float {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  

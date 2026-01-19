@@ -1,0 +1,64 @@
+.store-root {
+  min-height: 100vh;
+  background: linear-gradient(#2d4fb5, #1b2559);
+  color: white;
+  padding: 16px;
+}
+
+.store-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.store-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.store-tabs button {
+  background: #344f9c;
+  border: none;
+  padding: 10px 14px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.store-tabs .active {
+  background: #00e5ff;
+  color: #002b36;
+}
+
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.store-card {
+  background: #7d6cff;
+  padding: 16px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.store-card button {
+  margin-top: 10px;
+  width: 100%;
+  border: none;
+  background: #2196f3;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.value {
+  background: #00e676;
+  color: #003b1f;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+}
