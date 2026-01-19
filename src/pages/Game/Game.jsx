@@ -61,7 +61,6 @@ export default function Game() {
       });
     };
 
-    /* ✅ FIXED GAME_ENDED HANDLER */
     const onGameEnded = ({ winner, players }) => {
       useGameStore.getState().patchGame({
         status: "ended",
@@ -102,7 +101,17 @@ export default function Game() {
       socket.off("GAME_ENDED", onGameEnded);
       socket.off("FORCE_EXIT", onForceExit);
     };
-  }, [code, socket, player?.id, navigate, reset]);
+  }, [
+    code,
+    socket,
+    player?.id,
+    navigate,
+    reset,
+    setGame,
+    setIsDrawer,
+    setWordChoices,
+    clearWordChoices,
+  ]);
 
   /* ================= BLOCK BACK ================= */
   useEffect(() => {
@@ -125,8 +134,9 @@ export default function Game() {
     window.history.pushState(null, "", window.location.href);
     window.addEventListener("popstate", handlePopState);
 
-    return () =>
+    return () => {
       window.removeEventListener("popstate", handlePopState);
+    };
   }, [code, navigate, socket, reset]);
 
   /* ================= TAB CLOSE ================= */
@@ -139,11 +149,14 @@ export default function Game() {
     };
 
     window.addEventListener("beforeunload", warn);
-    return () =>
+    return () => {
       window.removeEventListener("beforeunload", warn);
+    };
   }, []);
 
-  if (!game) return <div className="game-loading">Loading game…</div>;
+  if (!game) {
+    return <div className="game-loading">Loading game…</div>;
+  }
 
   if (game.status === "ended" && game.rematch?.active) {
     return <RematchScreen />;
