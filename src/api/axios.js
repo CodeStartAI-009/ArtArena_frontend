@@ -1,7 +1,9 @@
 import axios from "axios";
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL || "http://localhost:5090";
 
 const API = axios.create({
-  baseURL: "https://art-arena-frontend-krr6.vercel.app", // backend URL
+  baseURL: API_BASE_URL, // backend URL
   withCredentials: true,
 });
 
