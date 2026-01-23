@@ -36,7 +36,7 @@ export default function Home() {
   const [socketReady, setSocketReady] = useState(socket.connected);
 
   /* =========================
-     SOCKET STATUS TRACKING
+     SOCKET STATUS
   ========================== */
   useEffect(() => {
     const onConnect = () => setSocketReady(true);
@@ -54,14 +54,13 @@ export default function Home() {
   }, [socket]);
 
   /* =========================
-     LIVE ECONOMY UPDATES
+     LIVE ECONOMY UPDATE
   ========================== */
   useEffect(() => {
     if (!user?.id) return;
 
     const onUserUpdated = ({ users }) => {
-      if (!Array.isArray(users)) return;
-      const updated = users.find(u => u.id === user.id);
+      const updated = users?.find(u => u.id === user.id);
       if (!updated) return;
 
       setUser(prev => ({
@@ -81,21 +80,10 @@ export default function Home() {
      PUBLIC PLAY
   ========================== */
   const handlePlayPublic = () => {
-    if (!authReady) {
-      console.warn("⏳ AUTH not ready");
-      return;
-    }
+    if (!authReady || !socket.connected) return;
 
-    if (!socket.connected) {
-      console.warn("⛔ Socket not connected");
-      return;
-    }
-
-    console.log("🎮 PLAY_PUBLIC sent");
     socket.emit("PLAY_PUBLIC");
-
     socket.once("MATCH_FOUND", ({ code }) => {
-      console.log("✅ MATCH_FOUND:", code);
       navigate(`/lobby/${code}`);
     });
   };
@@ -107,7 +95,25 @@ export default function Home() {
   return (
     <div className="home-root">
 
-      {/* LEVEL */}
+      {/* ================= TOP RIGHT BUTTONS ================= */}
+      <div className="top-right-actions">
+        <button
+          className="top-action-btn shop"
+          onClick={() => navigate("/store")}
+        >
+          🏪 Shop
+        </button>
+
+        <button
+          className="top-action-btn free"
+          onClick={() => navigate("/free")}
+        >
+          🎁 Free
+          <span className="badge">1</span>
+        </button>
+      </div>
+
+      {/* ================= LEVEL ================= */}
       <div className="level-section">
         <div className="level-badge">Lv {user.level}</div>
         <div className="xp-wrapper">
@@ -121,12 +127,9 @@ export default function Home() {
         </div>
       </div>
 
-      {/* LEFT PANEL */}
+      {/* ================= LEFT PANEL ================= */}
       <div className="left-panel">
-        <div
-          className="economy-box clickable"
-          onClick={() => navigate("/store")}
-        >
+        <div className="economy-box clickable" onClick={() => navigate("/store")}>
           <div className="currency">
             <img src={coinIcon} alt="Coins" />
             <span>{user.coins}</span>
@@ -157,14 +160,14 @@ export default function Home() {
         </div>
       </div>
 
-      {/* CENTER */}
+      {/* ================= CENTER ================= */}
       <div className="center-area">
         <div className="avatar-preview">
           <img src={avatarLogo} alt="Avatar" />
         </div>
       </div>
 
-      {/* ACTIONS */}
+      {/* ================= ACTIONS ================= */}
       <div className="bottom-actions">
         <button
           className="play-main-btn"
@@ -181,13 +184,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* FOOTER */}
+      {/* ================= FOOTER ================= */}
       <div className="home-footer">
-        <div className="footer-left">
-          <span>Privacy</span>
-          <span>T&C</span>
-        </div>
-
         <div className="footer-icons">
           <button><FaGlobe /></button>
           <button><FaCog /></button>
@@ -197,15 +195,11 @@ export default function Home() {
           <button onClick={() => document.documentElement.requestFullscreen()}>
             <FaExpand />
           </button>
-          <img
-            src={companyLogo}
-            alt="Studio Logo"
-            style={{ height: "28px", marginLeft: "8px" }}
-          />
+          <img src={companyLogo} alt="Logo" />
         </div>
       </div>
 
-      {/* MODALS */}
+      {/* ================= MODALS ================= */}
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       {showCreateModal && <CreateGameModal onClose={() => setShowCreateModal(false)} />}
       {showJoinModal && <JoinGameModal onClose={() => setShowJoinModal(false)} />}

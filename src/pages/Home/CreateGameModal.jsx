@@ -13,7 +13,8 @@ import { createRoom } from "../../api/room.api";
 
 /* ================= CONSTANTS ================= */
 const MODES = ["Classic", "Quick", "Kids", "Together"];
-const GAMEPLAY = ["Score", "Timer", "Drawing", "Open-canvas"];
+const GAMEPLAY_CLASSIC = ["Score", "Timer"];
+const GAMEPLAY_TOGETHER = ["Drawing", "Open-canvas"];
 const TIMERS = ["20 sec", "30 sec", "40 sec"];
 const SCORES = [5, 10, 15, 30];
 const ROUNDS = [2, 5, 8, 10, 15];
@@ -37,10 +38,15 @@ export default function CreateGameModal({ onClose }) {
 
   /* ================= DERIVED ================= */
   const selectedMode = MODES[mode];
-  const selectedGameplay = GAMEPLAY[gameplay];
-
   const isQuick = selectedMode === "Quick";
   const isKids = selectedMode === "Kids";
+  const isTogether = selectedMode === "Together";
+
+  const gameplayOptions = isTogether
+    ? GAMEPLAY_TOGETHER
+    : GAMEPLAY_CLASSIC;
+
+  const selectedGameplay = gameplayOptions[gameplay];
 
   const themeName =
     themes.find(t => t.id === theme)?.name || "Random";
@@ -57,14 +63,18 @@ export default function CreateGameModal({ onClose }) {
 
       const payload = {
         mode: selectedMode,
-        gameplay: isQuick ? "Timer" : selectedGameplay,
-        timer: TIMERS[timer],
+        gameplay: selectedGameplay,
+        timer:
+          selectedGameplay === "Timer" || isQuick
+            ? TIMERS[timer]
+            : null,
         score:
           selectedGameplay === "Score" && !isQuick
             ? SCORES[score]
             : null,
-        totalRounds: isKids ? null : ROUNDS[rounds],
-        maxPlayers: isKids ? 2 : MAX_PLAYERS[players],
+        totalRounds:
+          isKids || isTogether ? null : ROUNDS[rounds],
+        maxPlayers: isTogether ? 2 : MAX_PLAYERS[players],
         theme,
         isPrivate: true,
       };
@@ -89,7 +99,9 @@ export default function CreateGameModal({ onClose }) {
           </button>
 
           <h2>Create Private Game</h2>
-          <p className="subtitle">Private games do NOT award XP</p>
+          <p className="subtitle">
+            Private games do NOT award XP
+          </p>
 
           {/* MODE */}
           <Row
@@ -109,28 +121,30 @@ export default function CreateGameModal({ onClose }) {
 
           {showInfo && (
             <div className="mode-info">
-              {selectedMode === "Classic" && "Score or Timer"}
+              {selectedMode === "Classic" && "Score or Timer based play"}
               {selectedMode === "Quick" && "Fast timer-based rounds"}
-              {selectedMode === "Kids" && "Simplified, max 2 players"}
+              {selectedMode === "Kids" && "Simple mode, 2 players"}
+              {selectedMode === "Together" &&
+                "Two-player collaborative drawing"}
             </div>
           )}
 
           {/* GAMEPLAY */}
-          {!isQuick && !isKids && (
+          {(isTogether || (!isQuick && !isKids)) && (
             <Row
               label="Gameplay"
               value={selectedGameplay}
               onLeft={() =>
-                setGameplay(cycle(GAMEPLAY, gameplay, -1))
+                setGameplay(cycle(gameplayOptions, gameplay, -1))
               }
               onRight={() =>
-                setGameplay(cycle(GAMEPLAY, gameplay, 1))
+                setGameplay(cycle(gameplayOptions, gameplay, 1))
               }
             />
           )}
 
           {/* TIMER */}
-          {(selectedGameplay === "Timer" || isQuick) && (
+          {(selectedGameplay === "Timer" || isQuick) && !isTogether && (
             <Row
               label="Round Timer"
               value={TIMERS[timer]}
@@ -150,7 +164,7 @@ export default function CreateGameModal({ onClose }) {
           )}
 
           {/* ROUNDS */}
-          {!isKids && (
+          {!isKids && !isTogether && (
             <Row
               label="Total Rounds"
               value={ROUNDS[rounds]}
@@ -159,15 +173,17 @@ export default function CreateGameModal({ onClose }) {
             />
           )}
 
-          {/* PLAYERS */}
+          {/* MAX PLAYERS */}
           <Row
             label="Max Players"
-            value={isKids ? 2 : MAX_PLAYERS[players]}
+            value={isTogether || isKids ? 2 : MAX_PLAYERS[players]}
             onLeft={() =>
+              !isTogether &&
               !isKids &&
               setPlayers(cycle(MAX_PLAYERS, players, -1))
             }
             onRight={() =>
+              !isTogether &&
               !isKids &&
               setPlayers(cycle(MAX_PLAYERS, players, 1))
             }

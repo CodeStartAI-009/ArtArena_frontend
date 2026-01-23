@@ -152,6 +152,21 @@
   background: #e0e0e0;
   cursor: not-allowed;
 }
+.canvas-wrapper {
+  position: relative;
+  width: 800px;
+  margin: auto;
+}
+
+.canvas-divider {
+  position: absolute;
+  left: 40%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: rgba(0,0,0,0.2);
+  pointer-events: none;
+}
 
 /* ===============================
    MOBILE ADAPTATION

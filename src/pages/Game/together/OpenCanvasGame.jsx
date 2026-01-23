@@ -6,20 +6,40 @@ import "../Game.css";
 export default function OpenCanvasGame() {
   const socket = getSocket();
   const canvasRef = useRef(null);
-  const prevPoint = useRef(null);
+  const drawingRef = useRef(false);
+  const lastPointRef = useRef(null);
+
   const { game } = useGameStore();
 
+  /* =========================
+     SAFE READY FLAG
+  ========================== */
+  const isReady =
+    !!game &&
+    !!game.selfId &&
+    Array.isArray(game.players) &&
+    game.players.length >= 2;
+
+  const CANVAS_WIDTH = 500;
+  const CANVAS_HEIGHT = 400;
+
+  /* =========================
+     RECEIVE DRAW EVENTS
+  ========================== */
   useEffect(() => {
+    if (!canvasRef.current) return;
+
     const ctx = canvasRef.current.getContext("2d");
 
     const onDraw = ({ x, y, prevX, prevY }) => {
-      if (!prevX || !prevY) return;
+      if (prevX == null || prevY == null) return;
 
       ctx.beginPath();
       ctx.moveTo(prevX, prevY);
       ctx.lineTo(x, y);
       ctx.strokeStyle = "#222";
       ctx.lineWidth = 3;
+      ctx.lineCap = "round";
       ctx.stroke();
     };
 
@@ -27,25 +47,60 @@ export default function OpenCanvasGame() {
     return () => socket.off("DRAW", onDraw);
   }, [socket]);
 
-  const handleDraw = (e) => {
+  /* =========================
+     HELPERS
+  ========================== */
+  const getPos = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+  };
+
+  /* =========================
+     MOUSE EVENTS
+  ========================== */
+  const onMouseDown = (e) => {
+    if (!isReady) return;
+
+    drawingRef.current = true;
+    lastPointRef.current = getPos(e);
+  };
+
+  const onMouseMove = (e) => {
+    if (!drawingRef.current || !isReady) return;
+
+    const { x, y } = getPos(e);
+    const prev = lastPointRef.current;
+    if (!prev) return;
 
     socket.emit("DRAW", {
       code: game.code,
       x,
       y,
-      prevX: prevPoint.current?.x,
-      prevY: prevPoint.current?.y,
+      prevX: prev.x,
+      prevY: prev.y,
     });
 
-    prevPoint.current = { x, y };
+    lastPointRef.current = { x, y };
   };
 
-  const stopDrawing = () => {
-    prevPoint.current = null;
+  const onMouseUp = () => {
+    drawingRef.current = false;
+    lastPointRef.current = null;
   };
+
+  /* =========================
+     RENDER
+  ========================== */
+  if (!isReady) {
+    return (
+      <div className="game-loading">
+        Waiting for players…
+      </div>
+    );
+  }
 
   return (
     <div className="game-root">
@@ -53,16 +108,17 @@ export default function OpenCanvasGame() {
 
       <canvas
         ref={canvasRef}
-        width={900}
-        height={500}
+        width={CANVAS_WIDTH}
+        height={CANVAS_HEIGHT}
         className="drawing-canvas"
-        onMouseMove={handleDraw}
-        onMouseLeave={stopDrawing}
-        onMouseUp={stopDrawing}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseUp}
       />
 
       <p className="together-hint">
-        Draw anything together — no rules, no words
+        Draw freely together — no sides, no limits
       </p>
     </div>
   );

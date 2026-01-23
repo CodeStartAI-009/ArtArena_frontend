@@ -299,33 +299,58 @@
   .play-main-btn:active {
     transform: translateY(6px);
   }
-  
-  /* ---------------- TOP RIGHT ---------------- */
-  .top-right {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    display: flex;
-    gap: 14px;
-  }
-  
-  .top-right img {
-    width: 45px;
-    height: 45px;
-    margin-right: -6px;
-  }
-  
-  .icon-btn {
-    background: linear-gradient(180deg, #3c62c7, #294b9e);
-    border-radius: 18px;
-    padding: 10px 20px 10px 18px;
-    font-weight: 900;
-    border: 2px solid rgba(255,255,255,0.25);
-    box-shadow:
-      inset 0 2px 0 rgba(255,255,255,0.2),
-      0 6px 12px rgba(0,0,0,0.35);
-  }
-  
+   /* ================= TOP RIGHT ACTIONS ================= */
+.top-right-actions {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  gap: 14px;
+  z-index: 6;
+}
+
+.top-action-btn {
+  position: relative;
+  padding: 12px 22px;
+  border-radius: 20px;
+  border: 2px solid rgba(255,255,255,0.35);
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  color: white;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.25),
+    0 6px 0 rgba(0,0,0,0.25),
+    0 12px 20px rgba(0,0,0,0.35);
+}
+
+.top-action-btn.shop {
+  background: linear-gradient(180deg, #4a9bff, #2f6bd6);
+}
+
+.top-action-btn.free {
+  background: linear-gradient(180deg, #5cc6ff, #2bbcd6);
+}
+
+.top-action-btn:active {
+  transform: translateY(4px);
+}
+
+/* BADGE */
+.top-action-btn .badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: linear-gradient(180deg, #ff7a7a, #ff3b3b);
+  color: white;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 4px 8px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
   /* ---------------- FOOTER ---------------- */
    /* ---------------- FOOTER ---------------- */
 .home-footer {
@@ -381,4 +406,183 @@
   box-shadow:
     inset 0 2px 0 rgba(255,255,255,0.25),
     0 6px 12px rgba(0,0,0,0.35);
+}
+/* ================= TABLET ================= */
+@media (max-width: 1024px) {
+
+  .level-section {
+    top: 14px;
+    left: 14px;
+    padding: 10px 14px;
+  }
+
+  .xp-bar {
+    width: 130px;
+  }
+
+  .left-panel {
+    top: 110px;
+    left: 14px;
+    gap: 40px;
+  }
+
+  .center-area {
+    top: 110px;
+  }
+
+  .avatar-preview {
+    width: 140px;
+    height: 140px;
+  }
+
+  .bottom-actions {
+    bottom: 90px;
+  }
+
+  .play-main-btn {
+    padding: 22px 60px;
+    font-size: 26px;
+  }
+
+  .sub-actions button {
+    padding: 12px 26px;
+    font-size: 15px;
+  }
+
+  .top-right-actions {
+    top: 14px;
+    right: 14px;
+  }
+}
+/* ================= MOBILE ================= */
+@media (max-width: 715px) {
+
+  /* GENERAL */
+  .home-root {
+    font-size: 14px;
+  }
+
+  /* TOP LEFT (LEVEL) */
+  .level-section {
+    top: 10px;
+    left: 10px;
+    padding: 8px 12px;
+    border-radius: 14px;
+  }
+
+  .xp-bar {
+    width: 110px;
+    height: 10px;
+  }
+
+  .xp-text {
+    font-size: 10px;
+  }
+
+  /* TOP RIGHT BUTTONS */
+  .top-right-actions {
+    top: 10px;
+    right: 10px;
+    gap: 10px;
+  }
+
+  .top-action-btn {
+    padding: 10px 14px;
+    font-size: 14px;
+    border-radius: 16px;
+  }
+
+  .top-action-btn .badge {
+    top: -6px;
+    right: -6px;
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+
+  /* LEFT PANEL → BECOMES TOP STACK */
+   /* LEFT PANEL — MOBILE ALIGNMENT (MATCH LEVEL SECTION) */
+.left-panel {
+  top: 80px;          /* aligned under level-section */
+  left: 0%;         /* SAME inset as level-section */
+  transform: none;    /* IMPORTANT: remove centering */
+  padding: 8px 12px;
+  gap: 20px;
+}
+
+  
+  .economy-box,
+  .user-box {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .currency {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  /* CENTER AVATAR */
+  .center-area {
+    top: 200px;
+  }
+
+  .avatar-preview {
+    width: 120px;
+    height: 120px;
+  }
+
+  /* BOTTOM ACTIONS */
+  .bottom-actions {
+    bottom: 100px;
+    gap: 14px;
+  }
+
+  .play-main-btn {
+    padding: 18px 48px;
+    font-size: 22px;
+    border-radius: 26px;
+  }
+
+  .sub-actions {
+    gap: 12px;
+  }
+
+  .sub-actions button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  /* FOOTER */
+  .footer-icons {
+    right: 10px;
+    bottom: 6px;
+    gap: 10px;
+  }
+
+  .footer-icons button {
+    padding: 10px;
+  }
+
+  .footer-icons img {
+    width: 42px;
+    height: 42px;
+  }
+}
+/* ================= SMALL PHONES ================= */
+@media (max-width: 360px) {
+
+  .play-main-btn {
+    padding: 16px 40px;
+    font-size: 20px;
+  }
+
+  .avatar-preview {
+    width: 100px;
+    height: 100px;
+  }
+
+  .top-action-btn {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
 }

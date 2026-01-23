@@ -29,21 +29,26 @@ export default function Game() {
   const joinedRef = useRef(false);
   const exitingRef = useRef(false);
   const historyLockedRef = useRef(false);
-  const authSentRef = useRef(false);
 
-  /* ================= SOCKET SETUP ================= */
+  /* =========================
+     SOCKET SETUP
+  ========================== */
   useEffect(() => {
     if (!socket.connected) socket.connect();
+    if (!player?.id) return;
 
-    if (!authSentRef.current && player?.id) {
-      authSentRef.current = true;
-      socket.emit("AUTH", { userId: player.id });
-    }
-
+    /* -------- GAME STATE -------- */
     const onGameState = (state) => {
       if (!state) return;
+
       setGame(state);
-      setIsDrawer(state.drawerId === player.id);
+
+      // Drawer only applies to Classic / Quick
+      if (state.mode !== "Together") {
+        setIsDrawer(state.drawerId === player.id);
+      } else {
+        setIsDrawer(false);
+      }
     };
 
     const onWordChoices = (choices) => {
@@ -56,9 +61,7 @@ export default function Game() {
     };
 
     const onGuessingStarted = () => {
-      useGameStore.getState().patchGame({
-        guessingAllowed: true,
-      });
+      useGameStore.getState().patchGame({ guessingAllowed: true });
     };
 
     const onGameEnded = ({ winner, players }) => {
@@ -85,7 +88,8 @@ export default function Game() {
     socket.on("GAME_ENDED", onGameEnded);
     socket.on("FORCE_EXIT", onForceExit);
 
-    if (!joinedRef.current && player?.id) {
+    /* -------- JOIN GAME ONCE -------- */
+    if (!joinedRef.current) {
       joinedRef.current = true;
       socket.emit("GAME_JOIN", {
         code,
@@ -113,7 +117,9 @@ export default function Game() {
     clearWordChoices,
   ]);
 
-  /* ================= BLOCK BACK ================= */
+  /* =========================
+     BLOCK BACK BUTTON
+  ========================== */
   useEffect(() => {
     if (historyLockedRef.current) return;
     historyLockedRef.current = true;
@@ -139,7 +145,9 @@ export default function Game() {
     };
   }, [code, navigate, socket, reset]);
 
-  /* ================= TAB CLOSE ================= */
+  /* =========================
+     TAB CLOSE WARNING
+  ========================== */
   useEffect(() => {
     const warn = (e) => {
       if (!exitingRef.current) {
@@ -149,11 +157,12 @@ export default function Game() {
     };
 
     window.addEventListener("beforeunload", warn);
-    return () => {
-      window.removeEventListener("beforeunload", warn);
-    };
+    return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
+  /* =========================
+     RENDER
+  ========================== */
   if (!game) {
     return <div className="game-loading">Loading game…</div>;
   }
