@@ -41,35 +41,42 @@ export const AuthProvider = ({ children }) => {
   ========================== */
   useEffect(() => {
     if (!userRef.current) return;
-
+  
     const handleConnect = () => {
       setAuthReady(false);
-
+  
       console.log("🔐 AUTH sent:", userRef.current.id);
-
+  
       socket.emit("AUTH", {
         userId: userRef.current.id,
         username: userRef.current.username,
       });
     };
-
+  
     const handleAuthSuccess = () => {
       console.log("✅ AUTH READY");
       setAuthReady(true);
     };
-
+  
+    const handleDisconnect = () => {
+      setAuthReady(false);
+    };
+  
     if (!socket.connected) {
       socket.connect();
     }
-
+  
     socket.on("connect", handleConnect);
     socket.on("AUTH_SUCCESS", handleAuthSuccess);
-
+    socket.on("disconnect", handleDisconnect);
+  
     return () => {
       socket.off("connect", handleConnect);
       socket.off("AUTH_SUCCESS", handleAuthSuccess);
+      socket.off("disconnect", handleDisconnect);
     };
   }, [socket]);
+  
 
   return (
     <AuthContext.Provider value={{ user, setUser, authReady }}>
