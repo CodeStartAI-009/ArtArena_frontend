@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [authReady, setAuthReady] = useState(false);
 
   const userRef = useRef(null);
+  const hasAuthedRef = useRef(false); // 🔑 prevents authReady resets
 
   /* =========================
      LOAD OR CREATE GUEST (ONCE)
@@ -37,49 +38,43 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /* =========================
-     SOCKET CONNECT + AUTH (EVERY CONNECT)
+     SOCKET CONNECT + AUTH (STABLE)
   ========================== */
   useEffect(() => {
     if (!userRef.current) return;
-  
+
     const handleConnect = () => {
-      setAuthReady(false);
-  
       console.log("🔐 AUTH sent:", userRef.current.id);
-  
+
       socket.emit("AUTH", {
         userId: userRef.current.id,
         username: userRef.current.username,
       });
     };
-  
+
     const handleAuthSuccess = () => {
+      if (hasAuthedRef.current) return;
+
       console.log("✅ AUTH READY");
+      hasAuthedRef.current = true;
       setAuthReady(true);
     };
-  
-    const handleDisconnect = () => {
-      setAuthReady(false);
-    };
-  
+
     if (!socket.connected) {
       socket.connect();
     }
-  
+
     socket.on("connect", handleConnect);
     socket.on("AUTH_SUCCESS", handleAuthSuccess);
-    socket.on("disconnect", handleDisconnect);
-  
+
     return () => {
       socket.off("connect", handleConnect);
       socket.off("AUTH_SUCCESS", handleAuthSuccess);
-      socket.off("disconnect", handleDisconnect);
     };
   }, [socket]);
-  
 
   return (
-    <AuthContext.Provider value={{ user, setUser, authReady }}>
+    <AuthContext.Provider value={{ user, authReady }}>
       {children}
     </AuthContext.Provider>
   );
