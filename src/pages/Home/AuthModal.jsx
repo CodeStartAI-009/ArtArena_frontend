@@ -18,7 +18,7 @@ export default function AuthModal({ onClose }) {
   const handleGoogle = () => {
     const guestId = localStorage.getItem("guest_id") || "";
     window.location.href =
-      `http://localhost:5090/auth/google?guestId=${guestId}`;
+      `https://artarena-backend.onrender.com/auth/google?guestId=${guestId}`;
   };
 
   /* =========================
