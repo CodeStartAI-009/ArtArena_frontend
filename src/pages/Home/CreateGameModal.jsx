@@ -80,9 +80,16 @@ export default function CreateGameModal({ onClose }) {
       };
 
       const res = await createRoom(payload);
-      navigate(`/lobby/${res.data.room.code}`);
+
+      // ✅ CORRECT: extract code
+      const code = res.data.room.code;
+
+      // ✅ ONLY navigate
+      navigate(`/lobby/${code}`);
+
+      onClose();
     } catch (err) {
-      console.error(err);
+      console.error("❌ Failed to create room", err);
       alert("Failed to create room");
     } finally {
       setLoading(false);
@@ -99,9 +106,7 @@ export default function CreateGameModal({ onClose }) {
           </button>
 
           <h2>Create Private Game</h2>
-          <p className="subtitle">
-            Private games do NOT award XP
-          </p>
+          <p className="subtitle">Private games do NOT award XP</p>
 
           {/* MODE */}
           <Row

@@ -1,5 +1,5 @@
 import "./Home.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import AuthModal from "./AuthModal";
@@ -35,8 +35,10 @@ export default function Home() {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [socketReady, setSocketReady] = useState(socket.connected);
 
+  const playLockRef = useRef(false);
+
   /* =========================
-     SOCKET STATUS
+     SOCKET STATUS (READ-ONLY)
   ========================== */
   useEffect(() => {
     const onConnect = () => setSocketReady(true);
@@ -45,8 +47,6 @@ export default function Home() {
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
 
-    if (!socket.connected) socket.connect();
-
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
@@ -54,13 +54,13 @@ export default function Home() {
   }, [socket]);
 
   /* =========================
-     LIVE ECONOMY UPDATE
+     ECONOMY UPDATES
   ========================== */
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?._id) return;
 
     const onUserUpdated = ({ users }) => {
-      const updated = users?.find(u => u.id === user.id);
+      const updated = users?.find(u => u.id === user._id);
       if (!updated) return;
 
       setUser(prev => ({
@@ -74,20 +74,25 @@ export default function Home() {
 
     socket.on("USER_UPDATED", onUserUpdated);
     return () => socket.off("USER_UPDATED", onUserUpdated);
-  }, [socket, user?.id, setUser]);
+  }, [socket, user?._id, setUser]);
 
   /* =========================
-     PUBLIC PLAY
+     PUBLIC PLAY (FINAL)
   ========================== */
   const handlePlayPublic = () => {
     if (!authReady || !socket.connected) return;
-
+    if (playLockRef.current) return;
+  
+    playLockRef.current = true;
+  
     socket.emit("PLAY_PUBLIC");
+  
     socket.once("MATCH_FOUND", ({ code }) => {
+      playLockRef.current = false;
       navigate(`/lobby/${code}`);
     });
   };
-
+  
   if (!user) return null;
 
   const playDisabled = !authReady || !socketReady;
@@ -95,7 +100,7 @@ export default function Home() {
   return (
     <div className="home-root">
 
-      {/* ================= TOP RIGHT BUTTONS ================= */}
+      {/* ================= TOP RIGHT ================= */}
       <div className="top-right-actions">
         <button
           className="top-action-btn shop"
@@ -108,8 +113,7 @@ export default function Home() {
           className="top-action-btn free"
           onClick={() => navigate("/free")}
         >
-          🎁 Free
-          <span className="badge">1</span>
+          🎁 Free <span className="badge">1</span>
         </button>
       </div>
 
@@ -129,7 +133,10 @@ export default function Home() {
 
       {/* ================= LEFT PANEL ================= */}
       <div className="left-panel">
-        <div className="economy-box clickable" onClick={() => navigate("/store")}>
+        <div
+          className="economy-box clickable"
+          onClick={() => navigate("/store")}
+        >
           <div className="currency">
             <img src={coinIcon} alt="Coins" />
             <span>{user.coins}</span>

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getSocket } from "../../socket/socket";
 import useGameStore from "./store/store";
 import { useAuth } from "../../context/AuthContext";
+import themes from "../Home/themes";
 
 import ClassicGame from "./classic/ClassicGame";
 import QuickGame from "./Quick/QuickGame";
@@ -33,10 +34,10 @@ export default function Game() {
   /* ================= SOCKET SETUP ================= */
   useEffect(() => {
     if (!authReady || !user?._id) return;
-    if (!socket.connected) socket.connect();
 
     const userId = String(user._id);
 
+    /* ---------- GAME STATE ---------- */
     const onGameState = (state) => {
       if (!state) return;
 
@@ -48,6 +49,7 @@ export default function Game() {
       setIsDrawer(String(state.drawerId) === userId);
     };
 
+    /* ---------- ROUND START ---------- */
     const onRoundStart = ({ round, drawerId }) => {
       useGameStore.getState().patchGame({
         round,
@@ -86,6 +88,9 @@ export default function Game() {
     };
 
     const onForceExit = () => {
+      exitingRef.current = true;
+      joinedRef.current = false;
+
       reset();
       navigate("/", { replace: true });
     };
@@ -99,6 +104,7 @@ export default function Game() {
     socket.on("GAME_ENDED", onGameEnded);
     socket.on("FORCE_EXIT", onForceExit);
 
+    /* ---------- JOIN GAME (ONCE) ---------- */
     if (!joinedRef.current) {
       joinedRef.current = true;
       socket.emit("GAME_JOIN", { code, userId });
@@ -114,9 +120,19 @@ export default function Game() {
       socket.off("GAME_ENDED", onGameEnded);
       socket.off("FORCE_EXIT", onForceExit);
     };
-  }, [authReady, user?._id, code, socket, navigate, reset, setGame, setIsDrawer, setWordChoices]);
+  }, [
+    authReady,
+    user?._id,
+    code,
+    socket,
+    navigate,
+    reset,
+    setGame,
+    setIsDrawer,
+    setWordChoices,
+  ]);
 
-  /* ================= BLOCK BACK ================= */
+  /* ================= BLOCK BACK BUTTON ================= */
   useEffect(() => {
     if (historyLockedRef.current) return;
     historyLockedRef.current = true;
@@ -137,10 +153,12 @@ export default function Game() {
     window.history.pushState(null, "", window.location.href);
     window.addEventListener("popstate", handlePopState);
 
-    return () => window.removeEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
   }, [code, navigate, socket, reset]);
 
-  /* ================= TAB CLOSE ================= */
+  /* ================= TAB CLOSE WARNING ================= */
   useEffect(() => {
     const warn = (e) => {
       if (!exitingRef.current) {
@@ -153,21 +171,46 @@ export default function Game() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  if (!game) return <div className="game-loading">Loading game…</div>;
+  /* ================= LOADING ================= */
+  if (!game) {
+    return <div className="game-loading">Loading game…</div>;
+  }
 
+  /* ================= THEME ================= */
+  const theme =
+    themes.find(t => t.id === game.theme) ||
+    themes.find(t => t.id === "classic");
+
+  /* ================= END / REMATCH ================= */
   if (game.status === "ended" && game.rematch?.active) {
     return <RematchScreen />;
   }
 
-  switch (game.mode) {
-    case "Classic": return <ClassicGame />;
-    case "Quick": return <QuickGame />;
-    case "Kids": return <KidsGame />;
-    case "Together":
-      return game.gameplay === "Drawing"
-        ? <DrawingGame />
-        : <OpenCanvasGame />;
-    default:
-      return <div>Unknown game mode</div>;
-  }
+  /* ================= RENDER ================= */
+  return (
+    <div
+      className="game-root"
+      style={{ backgroundImage: `url(${theme.image})` }}
+    >
+      {/* SAME OVERLAY AS LOBBY */}
+      <div className="game-overlay" />
+
+      {(() => {
+        switch (game.mode) {
+          case "Classic":
+            return <ClassicGame />;
+          case "Quick":
+            return <QuickGame />;
+          case "Kids":
+            return <KidsGame />;
+          case "Together":
+            return game.gameplay === "Drawing"
+              ? <DrawingGame />
+              : <OpenCanvasGame />;
+          default:
+            return <div>Unknown game mode</div>;
+        }
+      })()}
+    </div>
+  );
 }
