@@ -16,14 +16,13 @@ export default function Game() {
   const navigate = useNavigate();
   const socket = getSocket();
 
-  const { user, authReady } = useAuth(); // ✅ SINGLE SOURCE OF TRUTH
+  const { user, authReady } = useAuth();
 
   const {
     game,
     setGame,
     setIsDrawer,
     setWordChoices,
-    clearWordChoices,
     reset,
   } = useGameStore();
 
@@ -31,30 +30,24 @@ export default function Game() {
   const exitingRef = useRef(false);
   const historyLockedRef = useRef(false);
 
-  /* =========================
-     SOCKET SETUP
-  ========================== */
+  /* ================= SOCKET SETUP ================= */
   useEffect(() => {
     if (!authReady || !user?._id) return;
     if (!socket.connected) socket.connect();
 
     const userId = String(user._id);
 
-    /* ---------- GAME STATE ---------- */
     const onGameState = (state) => {
       if (!state) return;
 
       setGame({
         ...state,
-        selfId: userId, // 🔥 CRITICAL
+        selfId: userId,
       });
 
-      setIsDrawer(
-        String(state.drawerId) === userId
-      );
+      setIsDrawer(String(state.drawerId) === userId);
     };
 
-    /* ---------- ROUND START ---------- */
     const onRoundStart = ({ round, drawerId }) => {
       useGameStore.getState().patchGame({
         round,
@@ -68,7 +61,6 @@ export default function Game() {
       setIsDrawer(String(drawerId) === userId);
     };
 
-    /* ---------- TURN END ---------- */
     const onTurnEnd = () => {
       useGameStore.getState().patchGame({
         guessingAllowed: false,
@@ -76,40 +68,28 @@ export default function Game() {
       });
     };
 
-    /* ---------- CLEAR CANVAS ---------- */
     const onClearCanvas = () => {
-      useGameStore.getState().patchGame({
-        drawing: [],
-      });
+      useGameStore.getState().patchGame({ drawing: [] });
     };
 
-    /* ---------- GUESSING START ---------- */
     const onGuessingStarted = () => {
-      useGameStore
-        .getState()
-        .patchGame({ guessingAllowed: true });
+      useGameStore.getState().patchGame({ guessingAllowed: true });
     };
 
-    /* ---------- GAME ENDED ---------- */
     const onGameEnded = ({ winner, players }) => {
       useGameStore.getState().patchGame({
         status: "ended",
         winner,
         players,
-        rematch: {
-          active: true,
-          votes: {},
-        },
+        rematch: { active: true, votes: {} },
       });
     };
 
-    /* ---------- FORCE EXIT ---------- */
     const onForceExit = () => {
       reset();
       navigate("/", { replace: true });
     };
 
-    /* ---------- REGISTER EVENTS ---------- */
     socket.on("GAME_STATE", onGameState);
     socket.on("ROUND_START", onRoundStart);
     socket.on("TURN_END", onTurnEnd);
@@ -119,14 +99,9 @@ export default function Game() {
     socket.on("GAME_ENDED", onGameEnded);
     socket.on("FORCE_EXIT", onForceExit);
 
-    /* ---------- JOIN GAME (ONCE) ---------- */
     if (!joinedRef.current) {
       joinedRef.current = true;
-
-      socket.emit("GAME_JOIN", {
-        code,
-        userId, // ✅ DB ID ONLY
-      });
+      socket.emit("GAME_JOIN", { code, userId });
     }
 
     return () => {
@@ -139,21 +114,9 @@ export default function Game() {
       socket.off("GAME_ENDED", onGameEnded);
       socket.off("FORCE_EXIT", onForceExit);
     };
-  }, [
-    authReady,
-    user?._id,
-    code,
-    socket,
-    navigate,
-    reset,
-    setGame,
-    setIsDrawer,
-    setWordChoices,
-  ]);
+  }, [authReady, user?._id, code, socket, navigate, reset, setGame, setIsDrawer, setWordChoices]);
 
-  /* =========================
-     BLOCK BACK BUTTON
-  ========================== */
+  /* ================= BLOCK BACK ================= */
   useEffect(() => {
     if (historyLockedRef.current) return;
     historyLockedRef.current = true;
@@ -174,14 +137,10 @@ export default function Game() {
     window.history.pushState(null, "", window.location.href);
     window.addEventListener("popstate", handlePopState);
 
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
+    return () => window.removeEventListener("popstate", handlePopState);
   }, [code, navigate, socket, reset]);
 
-  /* =========================
-     TAB CLOSE WARNING
-  ========================== */
+  /* ================= TAB CLOSE ================= */
   useEffect(() => {
     const warn = (e) => {
       if (!exitingRef.current) {
@@ -194,32 +153,20 @@ export default function Game() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  /* =========================
-     RENDER
-  ========================== */
-  if (!game) {
-    return <div className="game-loading">Loading game…</div>;
-  }
+  if (!game) return <div className="game-loading">Loading game…</div>;
 
   if (game.status === "ended" && game.rematch?.active) {
     return <RematchScreen />;
   }
 
   switch (game.mode) {
-    case "Classic":
-      return <ClassicGame />;
-
-    case "Quick":
-      return <QuickGame />;
-
-    case "Kids":
-      return <KidsGame />;
-
+    case "Classic": return <ClassicGame />;
+    case "Quick": return <QuickGame />;
+    case "Kids": return <KidsGame />;
     case "Together":
       return game.gameplay === "Drawing"
         ? <DrawingGame />
         : <OpenCanvasGame />;
-
     default:
       return <div>Unknown game mode</div>;
   }
