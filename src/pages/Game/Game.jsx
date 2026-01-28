@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getSocket } from "../../socket/socket";
 import useGameStore from "./store/store";
-import { getPlayerIdentity } from "../../utils/getPlayerIdentity";
+import { useAuth } from "../../context/AuthContext";
 
 import ClassicGame from "./classic/ClassicGame";
 import QuickGame from "./Quick/QuickGame";
@@ -15,7 +15,8 @@ export default function Game() {
   const { code } = useParams();
   const navigate = useNavigate();
   const socket = getSocket();
-  const player = getPlayerIdentity();
+
+  const { user, authReady } = useAuth(); // ✅ SINGLE SOURCE OF TRUTH
 
   const {
     game,
@@ -34,36 +35,62 @@ export default function Game() {
      SOCKET SETUP
   ========================== */
   useEffect(() => {
+    if (!authReady || !user?._id) return;
     if (!socket.connected) socket.connect();
-    if (!player?.id) return;
 
-    /* -------- GAME STATE -------- */
+    const userId = String(user._id);
+
+    /* ---------- GAME STATE ---------- */
     const onGameState = (state) => {
       if (!state) return;
 
-      setGame(state);
+      setGame({
+        ...state,
+        selfId: userId, // 🔥 CRITICAL
+      });
 
-      // Drawer only applies to Classic / Quick
-      if (state.mode !== "Together") {
-        setIsDrawer(state.drawerId === player.id);
-      } else {
-        setIsDrawer(false);
-      }
+      setIsDrawer(
+        String(state.drawerId) === userId
+      );
     };
 
-    const onWordChoices = (choices) => {
-      setWordChoices(Array.isArray(choices) ? choices : []);
+    /* ---------- ROUND START ---------- */
+    const onRoundStart = ({ round, drawerId }) => {
+      useGameStore.getState().patchGame({
+        round,
+        drawerId,
+        guessingAllowed: false,
+        currentWord: null,
+        wordLength: 0,
+        selfId: userId,
+      });
+
+      setIsDrawer(String(drawerId) === userId);
     };
 
-    const onWordSelected = ({ wordLength }) => {
-      clearWordChoices();
-      useGameStore.getState().patchGame({ wordLength });
+    /* ---------- TURN END ---------- */
+    const onTurnEnd = () => {
+      useGameStore.getState().patchGame({
+        guessingAllowed: false,
+        currentWord: null,
+      });
     };
 
+    /* ---------- CLEAR CANVAS ---------- */
+    const onClearCanvas = () => {
+      useGameStore.getState().patchGame({
+        drawing: [],
+      });
+    };
+
+    /* ---------- GUESSING START ---------- */
     const onGuessingStarted = () => {
-      useGameStore.getState().patchGame({ guessingAllowed: true });
+      useGameStore
+        .getState()
+        .patchGame({ guessingAllowed: true });
     };
 
+    /* ---------- GAME ENDED ---------- */
     const onGameEnded = ({ winner, players }) => {
       useGameStore.getState().patchGame({
         status: "ended",
@@ -71,50 +98,57 @@ export default function Game() {
         players,
         rematch: {
           active: true,
-          votes: [],
+          votes: {},
         },
       });
     };
 
+    /* ---------- FORCE EXIT ---------- */
     const onForceExit = () => {
       reset();
       navigate("/", { replace: true });
     };
 
+    /* ---------- REGISTER EVENTS ---------- */
     socket.on("GAME_STATE", onGameState);
-    socket.on("WORD_CHOICES", onWordChoices);
-    socket.on("WORD_SELECTED", onWordSelected);
+    socket.on("ROUND_START", onRoundStart);
+    socket.on("TURN_END", onTurnEnd);
+    socket.on("CLEAR_CANVAS", onClearCanvas);
+    socket.on("WORD_CHOICES", setWordChoices);
     socket.on("GUESSING_STARTED", onGuessingStarted);
     socket.on("GAME_ENDED", onGameEnded);
     socket.on("FORCE_EXIT", onForceExit);
 
-    /* -------- JOIN GAME ONCE -------- */
+    /* ---------- JOIN GAME (ONCE) ---------- */
     if (!joinedRef.current) {
       joinedRef.current = true;
+
       socket.emit("GAME_JOIN", {
         code,
-        userId: player.id,
+        userId, // ✅ DB ID ONLY
       });
     }
 
     return () => {
       socket.off("GAME_STATE", onGameState);
-      socket.off("WORD_CHOICES", onWordChoices);
-      socket.off("WORD_SELECTED", onWordSelected);
+      socket.off("ROUND_START", onRoundStart);
+      socket.off("TURN_END", onTurnEnd);
+      socket.off("CLEAR_CANVAS", onClearCanvas);
+      socket.off("WORD_CHOICES", setWordChoices);
       socket.off("GUESSING_STARTED", onGuessingStarted);
       socket.off("GAME_ENDED", onGameEnded);
       socket.off("FORCE_EXIT", onForceExit);
     };
   }, [
+    authReady,
+    user?._id,
     code,
     socket,
-    player?.id,
     navigate,
     reset,
     setGame,
     setIsDrawer,
     setWordChoices,
-    clearWordChoices,
   ]);
 
   /* =========================
@@ -174,14 +208,18 @@ export default function Game() {
   switch (game.mode) {
     case "Classic":
       return <ClassicGame />;
+
     case "Quick":
       return <QuickGame />;
+
     case "Kids":
       return <KidsGame />;
+
     case "Together":
       return game.gameplay === "Drawing"
         ? <DrawingGame />
         : <OpenCanvasGame />;
+
     default:
       return <div>Unknown game mode</div>;
   }

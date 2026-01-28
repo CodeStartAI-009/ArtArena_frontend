@@ -1,25 +1,17 @@
-// src/socket/socket.js
 import { io } from "socket.io-client";
 
-let socket = null;
+const SOCKET_URL = process.env.REACT_APP_SOCKET_URL;
 
-export function getSocket() {
-  if (!socket) {
-    const SOCKET_URL = process.env.REACT_APP_SOCKET_URL;
-
-    if (!SOCKET_URL) {
-      console.error(
-        "❌ REACT_APP_SOCKET_URL is NOT defined. " +
-        "Set it in Vercel → Project → Settings → Environment Variables."
-      );
-    }
-
-    socket = io(SOCKET_URL, {
-      autoConnect: false,
-      transports: ["websocket"],
-      withCredentials: true,
-    });
-  }
-
-  return socket;
+if (!SOCKET_URL) {
+  console.error(
+    "❌ REACT_APP_SOCKET_URL is NOT defined. Check .env file."
+  );
 }
+
+export const socket = io(SOCKET_URL, {
+  transports: ["websocket"],
+  autoConnect: false,
+  withCredentials: true,
+});
+
+export const getSocket = () => socket;

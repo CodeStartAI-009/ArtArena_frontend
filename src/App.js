@@ -5,7 +5,7 @@ import Home from "./pages/Home/Home";
 import Store from "./pages/market/Store";
 import Lobby from "./pages/Lobby/Lobby";
 import Game from "./pages/Game/Game";
-
+import AuthSuccess from "./pages/AuthSuccess";
 import { useAuth } from "./context/AuthContext";
 import useAutoAuth from "./hooks/useAutoAuth";
 
@@ -26,6 +26,7 @@ export default function App() {
       <Route path="/lobby/:code" element={<Lobby />} />
       <Route path="/game/:code" element={<Game />} />
       <Route path="/store" element={<Store />} />
+      <Route path="/auth/success" element={<AuthSuccess />} />
     </Routes>
   );
 }

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { getSocket } from "../socket/socket";
+import { guestLogin, getMe } from "../api/auth.api";
 
 const AuthContext = createContext(null);
 
@@ -9,72 +10,66 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
 
-  const userRef = useRef(null);
-  const hasAuthedRef = useRef(false); // 🔑 prevents authReady resets
+  const socketAuthedRef = useRef(false);
 
   /* =========================
-     LOAD OR CREATE GUEST (ONCE)
+     LOAD USER (TOKEN → GUEST)
   ========================== */
   useEffect(() => {
-    let id = localStorage.getItem("guest_id");
-    let name = localStorage.getItem("guest_name");
+    const init = async () => {
+      const token = localStorage.getItem("artarena_token");
 
-    if (!id || !name) {
-      id = crypto.randomUUID();
-      name = `Guest_${Math.floor(Math.random() * 1_000_000)}`;
+      // 🔐 Logged-in user
+      if (token && token !== "undefined") {
+        try {
+          const res = await getMe();
+          setUser(res.data.user);
+          return;
+        } catch {
+          localStorage.removeItem("artarena_token");
+          localStorage.removeItem("guest_id");
+        }
+      }
 
-      localStorage.setItem("guest_id", id);
-      localStorage.setItem("guest_name", name);
-    }
+      // 👤 Guest user
+      try {
+        const guestId = localStorage.getItem("guest_id");
+        const res = await guestLogin(guestId);
 
-    const guest = {
-      id,
-      username: name,
-      isGuest: true,
+        setUser(res.data.user);
+        localStorage.setItem("artarena_token", res.data.token);
+        localStorage.setItem("guest_id", res.data.user._id);
+      } catch (err) {
+        console.error("Guest login failed", err);
+      }
     };
 
-    userRef.current = guest;
-    setUser(guest);
+    init();
   }, []);
 
   /* =========================
-     SOCKET CONNECT + AUTH (STABLE)
+     SOCKET AUTH (DB ID ONLY)
   ========================== */
   useEffect(() => {
-    if (!userRef.current) return;
+    if (!user?._id) return;
+    if (socketAuthedRef.current) return;
 
-    const handleConnect = () => {
-      console.log("🔐 AUTH sent:", userRef.current.id);
+    socketAuthedRef.current = true;
 
-      socket.emit("AUTH", {
-        userId: userRef.current.id,
-        username: userRef.current.username,
-      });
-    };
+    if (!socket.connected) socket.connect();
 
-    const handleAuthSuccess = () => {
-      if (hasAuthedRef.current) return;
+    socket.emit("AUTH", { userId: user._id });
 
-      console.log("✅ AUTH READY");
-      hasAuthedRef.current = true;
+    socket.on("AUTH_SUCCESS", () => {
+      console.log("✅ SOCKET AUTH READY:", user._id);
       setAuthReady(true);
-    };
+    });
 
-    if (!socket.connected) {
-      socket.connect();
-    }
-
-    socket.on("connect", handleConnect);
-    socket.on("AUTH_SUCCESS", handleAuthSuccess);
-
-    return () => {
-      socket.off("connect", handleConnect);
-      socket.off("AUTH_SUCCESS", handleAuthSuccess);
-    };
-  }, [socket]);
+    return () => socket.off("AUTH_SUCCESS");
+  }, [user, socket]);
 
   return (
-    <AuthContext.Provider value={{ user, authReady }}>
+    <AuthContext.Provider value={{ user, setUser, authReady }}>
       {children}
     </AuthContext.Provider>
   );
@@ -82,8 +77,6 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth must be used inside AuthProvider");
-  }
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
   return ctx;
 };
