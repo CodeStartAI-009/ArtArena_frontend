@@ -5,8 +5,6 @@ import { getSocket } from "../../socket/socket";
 import { useAuth } from "../../context/AuthContext";
 import themes from "../Home/themes";
 
-const COUNTDOWN_SECONDS = 10;
-
 export default function Lobby() {
   const { code } = useParams();
   const navigate = useNavigate();
@@ -14,12 +12,9 @@ export default function Lobby() {
   const { authReady, user } = useAuth();
 
   const [room, setRoom] = useState(null);
-  const [starting, setStarting] = useState(false);
-  const [countdown, setCountdown] = useState(null);
 
   const joinedRef = useRef(false);
   const navigatedRef = useRef(false);
-  const countdownRef = useRef(null);
 
   const players = Array.isArray(room?.players) ? room.players : [];
   const maxPlayers = room?.maxPlayers ?? "-";
@@ -28,8 +23,7 @@ export default function Lobby() {
   const canStart =
     isHost &&
     players.length >= 2 &&
-    room?.status === "lobby" &&
-    !starting;
+    room?.status === "lobby";
 
   const theme =
     themes.find(t => t.id === room?.theme) ||
@@ -37,12 +31,11 @@ export default function Lobby() {
 
   /* ================= SOCKET ================= */
   useEffect(() => {
-    if (!authReady) return;
-    if (!socket.connected) return;
-  
+    if (!authReady || !socket.connected) return;
+
     const onLobbyUpdate = (roomState) => {
       setRoom(roomState);
-  
+
       if (
         roomState.status === "playing" &&
         !navigatedRef.current
@@ -51,27 +44,33 @@ export default function Lobby() {
         navigate(`/game/${roomState.code}`);
       }
     };
-  
+
+    const onGameStarted = ({ code }) => {
+      if (navigatedRef.current) return;
+      navigatedRef.current = true;
+      navigate(`/game/${code}`);
+    };
+
     socket.on("LOBBY_UPDATE", onLobbyUpdate);
-  
-    // ✅ JOIN ONLY ONCE
+    socket.on("GAME_STARTED", onGameStarted);
+
     if (!joinedRef.current) {
       joinedRef.current = true;
       socket.emit("LOBBY_JOIN", { code });
+      socket.emit("LOBBY_SYNC", { code });
     }
-  
+
     return () => {
       socket.off("LOBBY_UPDATE", onLobbyUpdate);
+      socket.off("GAME_STARTED", onGameStarted);
     };
   }, [authReady, socket, code, navigate]);
-  
 
   /* ================= SPACE BAR ================= */
   useEffect(() => {
     const onKeyDown = (e) => {
       if (e.code !== "Space") return;
       e.preventDefault();
-
       if (!canStart) return;
       socket.emit("START_GAME", { code });
     };
@@ -111,15 +110,9 @@ export default function Lobby() {
       </div>
 
       <div className="lobby-footer">
-        {starting ? (
-          countdown > 0
-            ? <>Game starting in {countdown}s…</>
-            : "Starting game…"
-        ) : canStart ? (
-          "Press SPACE to start the game"
-        ) : (
-          "Waiting for players…"
-        )}
+        {canStart
+          ? "Press SPACE to start the game"
+          : "Waiting for players…"}
       </div>
     </div>
   );
