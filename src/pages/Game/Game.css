@@ -1,12 +1,11 @@
-/* ===============================
-   GLOBAL GAME LAYOUT
+ /* ===============================
+   ROOT GAME WRAPPER (ONLY ONCE)
 ================================ */
 
 .game-root {
   width: 100vw;
   height: 100vh;
 
-  /* 🔥 IMPORTANT: background comes from inline style */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -22,7 +21,7 @@
 }
 
 /* ===============================
-   BACKGROUND OVERLAY (LIKE LOBBY)
+   BACKGROUND OVERLAY
 ================================ */
 
 .game-overlay {
@@ -30,17 +29,27 @@
   inset: 0;
   background: radial-gradient(
     ellipse at center,
-    rgba(0, 0, 0, 0.1) 0%,
-    rgba(0, 0, 0, 0.45) 70%,
-    rgba(0, 0, 0, 0.8) 100%
+    rgba(0, 0, 0, 0.15) 0%,
+    rgba(0, 0, 0, 0.55) 70%,
+    rgba(0, 0, 0, 0.85) 100%
   );
   z-index: 0;
 }
 
-/* 🔒 Ensure all game UI stays above overlay */
-.game-root > * {
+/* ===============================
+   GAME CONTENT LAYER
+================================ */
+
+.game-screen {
   position: relative;
   z-index: 1;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* ===============================
@@ -51,14 +60,16 @@
   width: 100%;
   height: 64px;
   background: linear-gradient(180deg, #2f6fd3, #1c4fa1);
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 0 28px;
   font-weight: 900;
   font-size: 18px;
+
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  z-index: 10;
 }
 
 .game-top .timer {
@@ -67,7 +78,6 @@
   padding: 6px 14px;
   border-radius: 999px;
   font-weight: 900;
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* ===============================
@@ -78,29 +88,24 @@
   position: absolute;
   left: 18px;
   top: 84px;
+
   width: 200px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  z-index: 9;
 }
 
 .player-card {
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.6);
   border-radius: 14px;
   padding: 10px 14px;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   font-weight: 800;
   backdrop-filter: blur(6px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-}
-
-.player-card .player-name {
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .player-card span:last-child {
@@ -108,22 +113,34 @@
   color: #000;
   padding: 4px 10px;
   border-radius: 10px;
-  font-weight: 900;
 }
 
 /* ===============================
    WORD MASK
 ================================ */
-
 .word-mask {
-  margin-top: 16px;
-  font-size: 34px;
-  letter-spacing: 14px;
-  font-weight: 900;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.word-letter {
+  font-size: 28px;
+  font-weight: 700;
+  width: 28px;
   text-align: center;
-  color: #ffdf6a;
-  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
-  z-index: 5;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.word-letter.revealed {
+  border-bottom-color: transparent;
+}
+
+.word-letter.space {
+  border-bottom: none;
+  width: 16px;
 }
 
 /* ===============================
@@ -132,18 +149,19 @@
 
 .drawing-canvas {
   margin-top: 20px;
+
   width: 640px;
   height: 420px;
+
   background: #ffffff;
   border-radius: 18px;
   cursor: crosshair;
+
   box-shadow:
     inset 0 2px 0 rgba(0, 0, 0, 0.05),
     0 18px 40px rgba(0, 0, 0, 0.55);
-  z-index: 4;
 }
 
-/* Disabled (guessers / waiting state) */
 .drawing-canvas.disabled {
   cursor: not-allowed;
   opacity: 0.75;
@@ -157,51 +175,54 @@
 .guess-input {
   margin-top: 18px;
   width: 420px;
+
   padding: 14px 18px;
   border-radius: 16px;
   border: none;
-  outline: none;
+
   font-size: 18px;
   font-weight: 700;
   text-align: center;
+
   background: #ffffff;
   color: #000;
-  box-shadow:
-    inset 0 3px 0 rgba(0, 0, 0, 0.1),
-    0 12px 30px rgba(0, 0, 0, 0.45);
-}
-
-.guess-input::placeholder {
-  color: #888;
 }
 
 .guess-input:disabled {
   background: #e0e0e0;
-  cursor: not-allowed;
 }
 
 /* ===============================
-   CANVAS WRAPPER
+   TOGETHER MODE
 ================================ */
 
 .canvas-wrapper {
   position: relative;
   width: 800px;
-  margin: auto;
+  margin-top: 20px;
 }
 
 .canvas-divider {
   position: absolute;
-  left: 40%;
+  left: 50%;
   top: 0;
   width: 2px;
   height: 100%;
-  background: rgba(0, 0, 0, 0.2);
-  pointer-events: none;
+  background: rgba(0, 0, 0, 0.25);
 }
 
 /* ===============================
-   MOBILE ADAPTATION
+   LOADING / WAIT STATES
+================================ */
+
+.game-loading {
+  margin-top: 40vh;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* ===============================
+   MOBILE
 ================================ */
 
 @media (max-width: 900px) {
@@ -221,5 +242,9 @@
   .word-mask {
     font-size: 26px;
     letter-spacing: 10px;
+  }
+
+  .canvas-wrapper {
+    width: 100%;
   }
 }

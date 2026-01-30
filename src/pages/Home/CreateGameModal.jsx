@@ -15,7 +15,9 @@ import { createRoom } from "../../api/room.api";
 const MODES = ["Classic", "Quick", "Kids", "Together"];
 const GAMEPLAY_CLASSIC = ["Score", "Timer"];
 const GAMEPLAY_TOGETHER = ["Drawing", "Open-canvas"];
-const TIMERS = ["20 sec", "30 sec", "40 sec"];
+/* ================= CONSTANTS ================= */
+const TIMERS = [20, 30, 40];
+
 const SCORES = [5, 10, 15, 30];
 const ROUNDS = [2, 5, 8, 10, 15];
 const MAX_PLAYERS = [2, 3, 4, 6, 8];
@@ -60,24 +62,24 @@ export default function CreateGameModal({ onClose }) {
 
     try {
       setLoading(true);
-
-      const payload = {
-        mode: selectedMode,
-        gameplay: selectedGameplay,
-        timer:
-          selectedGameplay === "Timer" || isQuick
-            ? TIMERS[timer]
-            : null,
-        score:
-          selectedGameplay === "Score" && !isQuick
-            ? SCORES[score]
-            : null,
-        totalRounds:
-          isKids || isTogether ? null : ROUNDS[rounds],
-        maxPlayers: isTogether ? 2 : MAX_PLAYERS[players],
-        theme,
-        isPrivate: true,
-      };
+ /* ================= CREATE ================= */
+const payload = {
+  mode: selectedMode,
+  gameplay: selectedGameplay,
+  timer:
+    selectedGameplay === "Timer" || isQuick
+      ? TIMERS[timer] // ✅ number
+      : null,
+  score:
+    selectedGameplay === "Score" && !isQuick
+      ? SCORES[score]
+      : null,
+  totalRounds:
+    isKids || isTogether ? null : ROUNDS[rounds],
+  maxPlayers: isTogether ? 2 : MAX_PLAYERS[players],
+  theme,
+  isPrivate: true,
+};
 
       const res = await createRoom(payload);
 
@@ -150,12 +152,13 @@ export default function CreateGameModal({ onClose }) {
 
           {/* TIMER */}
           {(selectedGameplay === "Timer" || isQuick) && !isTogether && (
-            <Row
-              label="Round Timer"
-              value={TIMERS[timer]}
-              onLeft={() => setTimer(cycle(TIMERS, timer, -1))}
-              onRight={() => setTimer(cycle(TIMERS, timer, 1))}
-            />
+             <Row
+             label="Round Timer"
+             value={`${TIMERS[timer]} sec`}
+             onLeft={() => setTimer(cycle(TIMERS, timer, -1))}
+             onRight={() => setTimer(cycle(TIMERS, timer, 1))}
+           />
+           
           )}
 
           {/* SCORE */}
