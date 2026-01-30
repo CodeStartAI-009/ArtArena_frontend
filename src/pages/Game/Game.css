@@ -1,4 +1,4 @@
- /* ===============================
+/* ===============================
    ROOT GAME WRAPPER (ONLY ONCE)
 ================================ */
 
@@ -21,19 +21,20 @@
 }
 
 /* ===============================
-   BACKGROUND OVERLAY
+   BACKGROUND OVERLAY (BEHIND GAME UI)
 ================================ */
 
 .game-overlay {
   position: absolute;
   inset: 0;
+  z-index: 0;
+
   background: radial-gradient(
     ellipse at center,
     rgba(0, 0, 0, 0.15) 0%,
     rgba(0, 0, 0, 0.55) 70%,
     rgba(0, 0, 0, 0.85) 100%
   );
-  z-index: 0;
 }
 
 /* ===============================
@@ -42,7 +43,7 @@
 
 .game-screen {
   position: relative;
-  z-index: 1;
+  z-index: 2; /* 🔑 ABOVE OVERLAY */
 
   width: 100%;
   height: 100%;
@@ -118,6 +119,7 @@
 /* ===============================
    WORD MASK
 ================================ */
+
 .word-mask {
   display: flex;
   justify-content: center;
@@ -144,28 +146,43 @@
 }
 
 /* ===============================
-   DRAWING CANVAS
+   DRAWING AREA (ISOLATED BOARD)
 ================================ */
 
-.drawing-canvas {
-  margin-top: 20px;
+.canvas-wrapper {
+  position: relative;
+  z-index: 3;
 
-  width: 640px;
+  width: 800px;
   height: 420px;
 
-  background: #ffffff;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* ❌ NO background-color here */
+
   border-radius: 18px;
-  cursor: crosshair;
+  overflow: hidden;
 
   box-shadow:
-    inset 0 2px 0 rgba(0, 0, 0, 0.05),
-    0 18px 40px rgba(0, 0, 0, 0.55);
+    inset 0 2px 0 rgba(255,255,255,0.25),
+    0 18px 40px rgba(0,0,0,0.55);
 }
 
+/* DRAWING LAYER */
+.drawing-canvas {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+
 .drawing-canvas.disabled {
-  cursor: not-allowed;
-  opacity: 0.75;
   pointer-events: none;
+  opacity: 0.75;
 }
 
 /* ===============================
@@ -196,12 +213,6 @@
    TOGETHER MODE
 ================================ */
 
-.canvas-wrapper {
-  position: relative;
-  width: 800px;
-  margin-top: 20px;
-}
-
 .canvas-divider {
   position: absolute;
   left: 50%;
@@ -230,7 +241,7 @@
     display: none;
   }
 
-  .drawing-canvas {
+  .canvas-wrapper {
     width: 92vw;
     height: 50vh;
   }
@@ -242,9 +253,5 @@
   .word-mask {
     font-size: 26px;
     letter-spacing: 10px;
-  }
-
-  .canvas-wrapper {
-    width: 100%;
   }
 }

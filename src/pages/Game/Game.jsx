@@ -36,7 +36,6 @@ export default function Game() {
 
     const userId = String(user._id);
 
-    /* ---------- GAME STATE ---------- */
     const onGameState = (state) => {
       if (!state) return;
 
@@ -48,7 +47,6 @@ export default function Game() {
       setIsDrawer(String(state.drawerId) === userId);
     };
 
-    /* ---------- ROUND START ---------- */
     const onRoundStart = ({ round, drawerId }) => {
       useGameStore.getState().patchGame({
         round,
@@ -77,10 +75,8 @@ export default function Game() {
       useGameStore.getState().patchGame({ guessingAllowed: true });
     };
 
-    /* ---------- GAME ENDED → GO HOME ---------- */
     const onGameEnded = () => {
       exitingRef.current = true;
-
       reset();
       navigate("/", { replace: true });
     };
@@ -88,7 +84,6 @@ export default function Game() {
     const onForceExit = () => {
       exitingRef.current = true;
       joinedRef.current = false;
-
       reset();
       navigate("/", { replace: true });
     };
@@ -102,7 +97,6 @@ export default function Game() {
     socket.on("GAME_ENDED", onGameEnded);
     socket.on("FORCE_EXIT", onForceExit);
 
-    /* ---------- JOIN GAME (ONCE) ---------- */
     if (!joinedRef.current) {
       joinedRef.current = true;
       socket.emit("GAME_JOIN", { code, userId });
@@ -174,31 +168,38 @@ export default function Game() {
     return <div className="game-loading">Loading game…</div>;
   }
 
-  /* ================= THEME ================= */
+  /* ================= THEME RESOLUTION ================= */
   const theme =
     themes.find(t => t.id === game.theme) ||
     themes.find(t => t.id === "classic");
+
+  const pageBackground = theme.image;
+  const boardBackground = theme.board;
 
   /* ================= RENDER ================= */
   return (
     <div
       className="game-root"
-      style={{ backgroundImage: `url(${theme.image})` }}
+      style={{ backgroundImage: `url(${pageBackground})` }}
     >
       <div className="game-overlay" />
 
       {(() => {
         switch (game.mode) {
           case "Classic":
-            return <ClassicGame />;
+            return <ClassicGame boardImage={boardBackground} />;
+
           case "Quick":
-            return <QuickGame />;
+            return <QuickGame boardImage={boardBackground} />;
+
           case "Kids":
-            return <KidsGame />;
+            return <KidsGame boardImage={boardBackground} />;
+
           case "Together":
             return game.gameplay === "Drawing"
-              ? <DrawingGame />
-              : <OpenCanvasGame />;
+              ? <DrawingGame boardImage={boardBackground} />
+              : <OpenCanvasGame boardImage={boardBackground} />;
+
           default:
             return <div>Unknown game mode</div>;
         }

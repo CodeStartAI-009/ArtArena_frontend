@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react";
 import { getSocket } from "../../../socket/socket";
 import useGameStore from "../store/store";
 
-export default function DrawingCanvas({ roomCode }) {
+export default function DrawingCanvas({ roomCode, boardImage }) {
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
   const lastPointRef = useRef(null);
@@ -11,18 +11,28 @@ export default function DrawingCanvas({ roomCode }) {
   const socket = getSocket();
   const { isDrawer } = useGameStore();
 
-  /* ================= INIT CANVAS + SOCKET ================= */
-  useEffect(() => {
+  const resizeCanvas = () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const wrapper = canvas?.parentElement;
+    if (!canvas || !wrapper) return;
+
+    canvas.width = wrapper.clientWidth;
+    canvas.height = wrapper.clientHeight;
 
     const ctx = canvas.getContext("2d");
     ctx.lineWidth = 4;
     ctx.lineCap = "round";
     ctx.strokeStyle = "#000";
     ctxRef.current = ctx;
+  };
+
+  useEffect(() => {
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
 
     const drawStroke = ({ x, y, prevX, prevY }) => {
+      const ctx = ctxRef.current;
+      if (!ctx) return;
       ctx.beginPath();
       ctx.moveTo(prevX, prevY);
       ctx.lineTo(x, y);
@@ -30,6 +40,9 @@ export default function DrawingCanvas({ roomCode }) {
     };
 
     const clearCanvas = () => {
+      const canvas = canvasRef.current;
+      const ctx = ctxRef.current;
+      if (!canvas || !ctx) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
 
@@ -41,34 +54,32 @@ export default function DrawingCanvas({ roomCode }) {
     socket.on("DRAW", drawStroke);
     socket.on("DRAW_SYNC", syncDrawing);
     socket.on("CLEAR_CANVAS", clearCanvas);
-
-    // 🔥 restore drawing on reload / reconnect
     socket.emit("REQUEST_DRAW_SYNC", { code: roomCode });
 
     return () => {
+      window.removeEventListener("resize", resizeCanvas);
       socket.off("DRAW", drawStroke);
       socket.off("DRAW_SYNC", syncDrawing);
       socket.off("CLEAR_CANVAS", clearCanvas);
     };
   }, [socket, roomCode]);
 
-  /* ================= HELPERS ================= */
   const getPoint = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
+    const t = e.touches?.[0];
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: (t ? t.clientX : e.clientX) - rect.left,
+      y: (t ? t.clientY : e.clientY) - rect.top,
     };
   };
 
-  /* ================= DRAW EVENTS ================= */
-  const onMouseDown = (e) => {
+  const startDrawing = (e) => {
     if (!isDrawer) return;
     isDrawingRef.current = true;
     lastPointRef.current = getPoint(e);
   };
 
-  const onMouseMove = (e) => {
+  const draw = (e) => {
     if (!isDrawer || !isDrawingRef.current) return;
 
     const point = getPoint(e);
@@ -97,29 +108,21 @@ export default function DrawingCanvas({ roomCode }) {
     lastPointRef.current = null;
   };
 
-  /* ================= RENDER ================= */
   return (
-    <div className="canvas-wrapper">
-      {isDrawer && (
-        <div className="canvas-tools">
-          <button onClick={() => socket.emit("UNDO", { code: roomCode })}>
-            Undo
-          </button>
-          <button onClick={() => socket.emit("REDO", { code: roomCode })}>
-            Redo
-          </button>
-        </div>
-      )}
-
+    <div
+      className="canvas-wrapper"
+      style={{ backgroundImage: `url(${boardImage})` }}
+    >
       <canvas
         ref={canvasRef}
-        width={600}
-        height={400}
         className={`drawing-canvas ${!isDrawer ? "disabled" : ""}`}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
+        onMouseDown={startDrawing}
+        onMouseMove={draw}
         onMouseUp={stopDrawing}
         onMouseLeave={stopDrawing}
+        onTouchStart={startDrawing}
+        onTouchMove={draw}
+        onTouchEnd={stopDrawing}
       />
     </div>
   );
