@@ -1,12 +1,12 @@
 import "./Home.css";
 import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import AuthModal from "./AuthModal";
 import CreateGameModal from "./CreateGameModal";
 import JoinGameModal from "./JoinGameModal";
 import { getSocket } from "../../socket/socket";
-import { Link } from "react-router-dom";
+
 /* ASSETS */
 import companyLogo from "../../assets/logo/company.jpeg";
 import coinIcon from "../../assets/icons/coins.png";
@@ -18,7 +18,6 @@ import {
   FaPlay,
   FaLock,
   FaPaintBrush,
-  FaGlobe,
   FaCog,
   FaDiscord,
   FaExpand,
@@ -29,14 +28,16 @@ export default function Home() {
   const { user, setUser, authReady } = useAuth();
   const navigate = useNavigate();
   const socket = getSocket();
-  const [showHowTo, setShowHowTo] = useState(false);
 
+  const [showHowTo, setShowHowTo] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [socketReady, setSocketReady] = useState(socket.connected);
 
   const playLockRef = useRef(false);
+
+  /* ================= FULLSCREEN TOGGLE ================= */
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
@@ -44,10 +45,8 @@ export default function Home() {
       document.exitFullscreen().catch(() => {});
     }
   };
-  
-  /* =========================
-     SOCKET STATUS (READ-ONLY)
-  ========================== */
+
+  /* ================= SOCKET STATUS ================= */
   useEffect(() => {
     const onConnect = () => setSocketReady(true);
     const onDisconnect = () => setSocketReady(false);
@@ -61,9 +60,7 @@ export default function Home() {
     };
   }, [socket]);
 
-  /* =========================
-     ECONOMY UPDATES
-  ========================== */
+  /* ================= ECONOMY UPDATES ================= */
   useEffect(() => {
     if (!user?._id) return;
 
@@ -84,23 +81,20 @@ export default function Home() {
     return () => socket.off("USER_UPDATED", onUserUpdated);
   }, [socket, user?._id, setUser]);
 
-  /* =========================
-     PUBLIC PLAY (FINAL)
-  ========================== */
+  /* ================= PUBLIC PLAY ================= */
   const handlePlayPublic = () => {
     if (!authReady || !socket.connected) return;
     if (playLockRef.current) return;
-  
+
     playLockRef.current = true;
-  
     socket.emit("PLAY_PUBLIC");
-  
+
     socket.once("MATCH_FOUND", ({ code }) => {
       playLockRef.current = false;
       navigate(`/lobby/${code}`);
     });
   };
-  
+
   if (!user) return null;
 
   const playDisabled = !authReady || !socketReady;
@@ -110,17 +104,11 @@ export default function Home() {
 
       {/* ================= TOP RIGHT ================= */}
       <div className="top-right-actions">
-        <button
-          className="top-action-btn shop"
-          onClick={() => navigate("/store")}
-        >
+        <button className="top-action-btn shop" onClick={() => navigate("/store")}>
           🏪 Shop
         </button>
 
-        <button
-          className="top-action-btn free"
-          onClick={() => navigate("/free")}
-        >
+        <button className="top-action-btn free" onClick={() => navigate("/free")}>
           🎁 Free <span className="badge">1</span>
         </button>
       </div>
@@ -141,10 +129,7 @@ export default function Home() {
 
       {/* ================= LEFT PANEL ================= */}
       <div className="left-panel">
-        <div
-          className="economy-box clickable"
-          onClick={() => navigate("/store")}
-        >
+        <div className="economy-box clickable" onClick={() => navigate("/store")}>
           <div className="currency">
             <img src={coinIcon} alt="Coins" />
             <span>{user.coins}</span>
@@ -201,56 +186,54 @@ export default function Home() {
 
       {/* ================= FOOTER ================= */}
       <div className="home-footer">
-        {/* ================= POLICY LINKS (BOTTOM CENTER) ================= */}
-<div className="policy-content">
-<div className="policy-links">
-  <Link to="/features" className="policy-link">Features</Link>
-  <Link to="/faq" className="policy-link">FAQ</Link>
-  <Link to="/terms" className="policy-link">Terms</Link>
-  <Link to="/privacy" className="policy-link">Privacy</Link>
-</div>
-</div>
 
+        {/* POLICY LINKS */}
+        <div className="policy-content">
+          <div className="policy-links">
+            <Link to="/features" className="policy-link">Features</Link>
+            <Link to="/faq" className="policy-link">FAQ</Link>
+            <Link to="/terms" className="policy-link">Terms</Link>
+            <Link to="/privacy" className="policy-link">Privacy</Link>
+          </div>
+        </div>
+
+        {/* ICONS */}
         <div className="footer-icons">
-           
-        <button onClick={() => setShowHowTo(true)}>
-  <FaCog />
-</button>
+          <button onClick={() => setShowHowTo(true)}>
+            <FaCog />
+          </button>
 
           <button onClick={() => window.open("https://discord.gg/artarena")}>
             <FaDiscord />
           </button>
+
           <button onClick={toggleFullscreen}>
-  <FaExpand />
-</button>
+            <FaExpand />
+          </button>
 
           <img src={companyLogo} alt="Logo" />
         </div>
       </div>
+
+      {/* ================= HOW TO PLAY MODAL ================= */}
       {showHowTo && (
-  <div className="howto-backdrop" onClick={() => setShowHowTo(false)}>
-    <div className="howto-modal" onClick={e => e.stopPropagation()}>
-      <button className="howto-close" onClick={() => setShowHowTo(false)}>
-        ✕
-      </button>
+        <div className="howto-backdrop" onClick={() => setShowHowTo(false)}>
+          <div className="howto-modal" onClick={e => e.stopPropagation()}>
+            <button className="howto-close" onClick={() => setShowHowTo(false)}>
+              ✕
+            </button>
 
-      <h2>How to Play</h2>
-
-      <ol>
-        <li>Click <b>PLAY</b> to join a public match instantly.</li>
-        <li>One player draws while others guess the word.</li>
-        <li>Guess correctly to earn XP, coins, and level up.</li>
-        <li>Create private rooms to play with friends.</li>
-        <li>The faster you guess, the higher your score.</li>
-      </ol>
-
-      <p className="howto-tip">
-        💡 Tip: Be quick and accurate to earn bonus points.
-      </p>
-    </div>
-  </div>
-)}
-
+            <h2>How to Play</h2>
+            <ol>
+              <li>Click <b>PLAY</b> to join a public match instantly.</li>
+              <li>One player draws while others guess the word.</li>
+              <li>Guess correctly to earn XP, coins, and level up.</li>
+              <li>Create private rooms to play with friends.</li>
+              <li>The faster you guess, the higher your score.</li>
+            </ol>
+          </div>
+        </div>
+      )}
 
       {/* ================= MODALS ================= */}
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}

@@ -1,3 +1,5 @@
+import "./legal.css";
+
 export default function Faq() {
     return (
       <div className="legal-page">
