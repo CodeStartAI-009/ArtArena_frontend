@@ -187,7 +187,7 @@ export default function Game() {
       {(() => {
         switch (game.mode) {
           case "Classic":
-            return <ClassicGame boardImage={boardBackground} />;
+            return <ClassicGame boardImage={theme.board} />;
 
           case "Quick":
             return <QuickGame boardImage={boardBackground} />;

@@ -1,3 +1,5 @@
+ // src/pages/Game/classic/ClassicGame.jsx
+
 import useGameStore from "../store/store";
 
 import TopBar from "../components/TopBar";
@@ -7,9 +9,8 @@ import GuessInput from "../components/GuessInput";
 import WordMask from "../components/WordMask";
 import StartGuessingButton from "../components/StartGuessingButton";
 import WordChoice from "../components/WordChoice";
- 
 
-export default function ClassicGame() {
+export default function ClassicGame({ boardImage }) {
   const { game, isDrawer, wordChoices } = useGameStore();
 
   if (!game) return null;
@@ -17,11 +18,11 @@ export default function ClassicGame() {
   const guessingAllowed = game.guessingAllowed === true;
 
   return (
-    <div className="game-root">
-      {/* ================= TOP ================= */}
+    <div className="game-screen">
+      {/* ================= TOP BAR ================= */}
       <TopBar round={game.round} />
 
-      {/* ================= PLAYERS ================= */}
+      {/* ================= PLAYER LIST ================= */}
       <PlayerList players={game.players} />
 
       {/* ================= WORD MASK ================= */}
@@ -30,26 +31,25 @@ export default function ClassicGame() {
         revealedLetters={game.revealedLetters ?? []}
       />
 
-      {/* ================= CANVAS ================= */}
-      <DrawingCanvas roomCode={game.code} />
+      {/* ================= DRAWING BOARD ================= */}
+      <DrawingCanvas
+        roomCode={game.code}
+        boardImage={boardImage}
+      />
 
       {/* ================= DRAWER CONTROLS ================= */}
       {isDrawer && wordChoices.length > 0 && (
         <WordChoice roomCode={game.code} />
       )}
 
-      {isDrawer &&
-        !guessingAllowed &&
-        wordChoices.length === 0 && (
-          <StartGuessingButton roomCode={game.code} />
-        )}
+      {isDrawer && !guessingAllowed && wordChoices.length === 0 && (
+        <StartGuessingButton roomCode={game.code} />
+      )}
 
       {/* ================= GUESSER CONTROLS ================= */}
       {!isDrawer && guessingAllowed && (
-  <>
-    <GuessInput roomCode={game.code} />
-  </>
-)}
+        <GuessInput roomCode={game.code} />
+      )}
     </div>
   );
 }

@@ -11,28 +11,40 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
   const socket = getSocket();
   const { isDrawer } = useGameStore();
 
-  const resizeCanvas = () => {
+  /* ================= CANVAS SETUP (RETINA SAFE) ================= */
+  const setupCanvas = () => {
     const canvas = canvasRef.current;
     const wrapper = canvas?.parentElement;
     if (!canvas || !wrapper) return;
 
-    canvas.width = wrapper.clientWidth;
-    canvas.height = wrapper.clientHeight;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = wrapper.getBoundingClientRect();
+
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
 
     const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
     ctx.lineWidth = 4;
     ctx.lineCap = "round";
     ctx.strokeStyle = "#000";
+
     ctxRef.current = ctx;
   };
 
+  /* ================= SOCKET + INIT ================= */
   useEffect(() => {
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+    setupCanvas();
+    window.addEventListener("resize", setupCanvas);
 
     const drawStroke = ({ x, y, prevX, prevY }) => {
       const ctx = ctxRef.current;
       if (!ctx) return;
+
       ctx.beginPath();
       ctx.moveTo(prevX, prevY);
       ctx.lineTo(x, y);
@@ -40,9 +52,11 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
     };
 
     const clearCanvas = () => {
-      const canvas = canvasRef.current;
       const ctx = ctxRef.current;
-      if (!canvas || !ctx) return;
+      const canvas = canvasRef.current;
+      if (!ctx || !canvas) return;
+
+      // 🔑 clear ONLY strokes, background stays
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
 
@@ -54,33 +68,40 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
     socket.on("DRAW", drawStroke);
     socket.on("DRAW_SYNC", syncDrawing);
     socket.on("CLEAR_CANVAS", clearCanvas);
+
     socket.emit("REQUEST_DRAW_SYNC", { code: roomCode });
 
     return () => {
-      window.removeEventListener("resize", resizeCanvas);
+      window.removeEventListener("resize", setupCanvas);
       socket.off("DRAW", drawStroke);
       socket.off("DRAW_SYNC", syncDrawing);
       socket.off("CLEAR_CANVAS", clearCanvas);
     };
   }, [socket, roomCode]);
 
+  /* ================= HELPERS ================= */
   const getPoint = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
     const t = e.touches?.[0];
+
     return {
       x: (t ? t.clientX : e.clientX) - rect.left,
       y: (t ? t.clientY : e.clientY) - rect.top,
     };
   };
 
+  /* ================= DRAW EVENTS ================= */
   const startDrawing = (e) => {
     if (!isDrawer) return;
+    e.preventDefault();
+
     isDrawingRef.current = true;
     lastPointRef.current = getPoint(e);
   };
 
   const draw = (e) => {
     if (!isDrawer || !isDrawingRef.current) return;
+    e.preventDefault();
 
     const point = getPoint(e);
     const prev = lastPointRef.current;
@@ -108,10 +129,16 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
     lastPointRef.current = null;
   };
 
+  /* ================= RENDER ================= */
   return (
     <div
       className="canvas-wrapper"
-      style={{ backgroundImage: `url(${boardImage})` }}
+      style={{
+        backgroundImage: `url(${boardImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
     >
       <canvas
         ref={canvasRef}
