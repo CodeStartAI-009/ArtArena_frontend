@@ -10,7 +10,6 @@ import QuickGame from "./Quick/QuickGame";
 import KidsGame from "./Kids/KidsGame";
 import DrawingGame from "./together/DrawingGame";
 import OpenCanvasGame from "./together/OpenCanvasGame";
-import RematchScreen from "./components/RematchScreen";
 
 export default function Game() {
   const { code } = useParams();
@@ -78,13 +77,12 @@ export default function Game() {
       useGameStore.getState().patchGame({ guessingAllowed: true });
     };
 
-    const onGameEnded = ({ winner, players }) => {
-      useGameStore.getState().patchGame({
-        status: "ended",
-        winner,
-        players,
-        rematch: { active: true, votes: {} },
-      });
+    /* ---------- GAME ENDED → GO HOME ---------- */
+    const onGameEnded = () => {
+      exitingRef.current = true;
+
+      reset();
+      navigate("/", { replace: true });
     };
 
     const onForceExit = () => {
@@ -181,18 +179,12 @@ export default function Game() {
     themes.find(t => t.id === game.theme) ||
     themes.find(t => t.id === "classic");
 
-  /* ================= END / REMATCH ================= */
-  if (game.status === "ended" && game.rematch?.active) {
-    return <RematchScreen />;
-  }
-
   /* ================= RENDER ================= */
   return (
     <div
       className="game-root"
       style={{ backgroundImage: `url(${theme.image})` }}
     >
-      {/* SAME OVERLAY AS LOBBY */}
       <div className="game-overlay" />
 
       {(() => {

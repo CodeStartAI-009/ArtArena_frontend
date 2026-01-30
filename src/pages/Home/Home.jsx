@@ -6,7 +6,7 @@ import AuthModal from "./AuthModal";
 import CreateGameModal from "./CreateGameModal";
 import JoinGameModal from "./JoinGameModal";
 import { getSocket } from "../../socket/socket";
-
+import { Link } from "react-router-dom";
 /* ASSETS */
 import companyLogo from "../../assets/logo/company.jpeg";
 import coinIcon from "../../assets/icons/coins.png";
@@ -29,6 +29,7 @@ export default function Home() {
   const { user, setUser, authReady } = useAuth();
   const navigate = useNavigate();
   const socket = getSocket();
+  const [showHowTo, setShowHowTo] = useState(false);
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -36,7 +37,14 @@ export default function Home() {
   const [socketReady, setSocketReady] = useState(socket.connected);
 
   const playLockRef = useRef(false);
-
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
+  
   /* =========================
      SOCKET STATUS (READ-ONLY)
   ========================== */
@@ -193,18 +201,56 @@ export default function Home() {
 
       {/* ================= FOOTER ================= */}
       <div className="home-footer">
+        {/* ================= POLICY LINKS (BOTTOM CENTER) ================= */}
+<div className="policy-content">
+<div className="policy-links">
+  <Link to="/features" className="policy-link">Features</Link>
+  <Link to="/faq" className="policy-link">FAQ</Link>
+  <Link to="/terms" className="policy-link">Terms</Link>
+  <Link to="/privacy" className="policy-link">Privacy</Link>
+</div>
+</div>
+
         <div className="footer-icons">
-          <button><FaGlobe /></button>
-          <button><FaCog /></button>
+           
+        <button onClick={() => setShowHowTo(true)}>
+  <FaCog />
+</button>
+
           <button onClick={() => window.open("https://discord.gg/artarena")}>
             <FaDiscord />
           </button>
-          <button onClick={() => document.documentElement.requestFullscreen()}>
-            <FaExpand />
-          </button>
+          <button onClick={toggleFullscreen}>
+  <FaExpand />
+</button>
+
           <img src={companyLogo} alt="Logo" />
         </div>
       </div>
+      {showHowTo && (
+  <div className="howto-backdrop" onClick={() => setShowHowTo(false)}>
+    <div className="howto-modal" onClick={e => e.stopPropagation()}>
+      <button className="howto-close" onClick={() => setShowHowTo(false)}>
+        ✕
+      </button>
+
+      <h2>How to Play</h2>
+
+      <ol>
+        <li>Click <b>PLAY</b> to join a public match instantly.</li>
+        <li>One player draws while others guess the word.</li>
+        <li>Guess correctly to earn XP, coins, and level up.</li>
+        <li>Create private rooms to play with friends.</li>
+        <li>The faster you guess, the higher your score.</li>
+      </ol>
+
+      <p className="howto-tip">
+        💡 Tip: Be quick and accurate to earn bonus points.
+      </p>
+    </div>
+  </div>
+)}
+
 
       {/* ================= MODALS ================= */}
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}

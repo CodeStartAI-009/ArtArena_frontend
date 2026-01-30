@@ -31,9 +31,9 @@ export default function Lobby() {
 
   /* ================= SOCKET ================= */
   useEffect(() => {
-    if (!authReady || !socket.connected) return;
+    if (!authReady || !user) return;
 
-    const onLobbyUpdate = (roomState) => {
+    const handleLobbyUpdate = (roomState) => {
       setRoom(roomState);
 
       if (
@@ -45,33 +45,43 @@ export default function Lobby() {
       }
     };
 
-    const onGameStarted = ({ code }) => {
+    const handleGameStarted = ({ code }) => {
       if (navigatedRef.current) return;
       navigatedRef.current = true;
       navigate(`/game/${code}`);
     };
 
-    socket.on("LOBBY_UPDATE", onLobbyUpdate);
-    socket.on("GAME_STARTED", onGameStarted);
+    socket.on("LOBBY_UPDATE", handleLobbyUpdate);
+    socket.on("GAME_STARTED", handleGameStarted);
 
-    if (!joinedRef.current) {
+    /* ---------- SAFE JOIN (ONCE) ---------- */
+    const joinLobby = () => {
+      if (joinedRef.current) return;
       joinedRef.current = true;
+
       socket.emit("LOBBY_JOIN", { code });
-      socket.emit("LOBBY_SYNC", { code });
+    };
+
+    if (socket.connected) {
+      joinLobby();
+    } else {
+      socket.once("connect", joinLobby);
     }
 
     return () => {
-      socket.off("LOBBY_UPDATE", onLobbyUpdate);
-      socket.off("GAME_STARTED", onGameStarted);
+      socket.off("LOBBY_UPDATE", handleLobbyUpdate);
+      socket.off("GAME_STARTED", handleGameStarted);
+      socket.off("connect", joinLobby);
     };
-  }, [authReady, socket, code, navigate]);
+  }, [authReady, user, socket, code, navigate]);
 
   /* ================= SPACE BAR ================= */
   useEffect(() => {
+    if (!canStart) return;
+
     const onKeyDown = (e) => {
       if (e.code !== "Space") return;
       e.preventDefault();
-      if (!canStart) return;
       socket.emit("START_GAME", { code });
     };
 
@@ -81,7 +91,11 @@ export default function Lobby() {
 
   /* ================= LOADING ================= */
   if (!room) {
-    return <div className="lobby-loading">Connecting to lobby…</div>;
+    return (
+      <div className="lobby-loading">
+        Connecting to lobby…
+      </div>
+    );
   }
 
   /* ================= UI ================= */
@@ -92,8 +106,12 @@ export default function Lobby() {
       style={{ backgroundImage: `url(${theme.image})` }}
     >
       <div className="lobby-title">
-        <span className="title-left">{theme.name} Arena</span>
-        <span className="title-right">{room.mode}</span>
+        <span className="title-left">
+          {theme.name} Arena
+        </span>
+        <span className="title-right">
+          {room.mode}
+        </span>
       </div>
 
       <div className="players-panel">
@@ -103,8 +121,13 @@ export default function Lobby() {
 
         {players.map((p, i) => (
           <div key={p.id} className="player-row">
-            <span className="player-index">{i + 1}</span>
-            <span className="player-name">{p.username}</span>
+            <span className="player-index">
+              {i + 1}
+            </span>
+            <span className="player-name">
+              {p.username}
+              {!p.connected && " (offline)"}
+            </span>
           </div>
         ))}
       </div>
