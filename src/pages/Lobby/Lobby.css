@@ -24,15 +24,15 @@
   z-index: 0;
 }
 
-/* ================= HEADER ================= */
+/* ================= TITLE BAR (FIXED) ================= */
 
-.lobby-header {
+.lobby-title {
   position: absolute;
   top: 18px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 20px;
+  gap: 24px;
   align-items: center;
   background: linear-gradient(180deg, #3c7df0, #2456b5);
   padding: 14px 32px;
@@ -45,12 +45,12 @@
     0 14px 35px rgba(0,0,0,0.45);
 }
 
-.lobby-mode {
-  font-size: 18px;
+.title-left {
+  font-size: 20px;
 }
 
-.lobby-code {
-  font-size: 14px;
+.title-right {
+  font-size: 15px;
   color: #ffe16a;
   opacity: 0.95;
 }
@@ -106,15 +106,6 @@
     0 6px 14px rgba(0,0,0,0.35);
 }
 
-.player-row.online {
-  opacity: 1;
-}
-
-.player-row.offline {
-  opacity: 0.55;
-  filter: grayscale(0.4);
-}
-
 .player-index {
   background: linear-gradient(180deg, #ffe16a, #ffb703);
   color: black;
@@ -141,13 +132,6 @@
   text-overflow: ellipsis;
 }
 
-
-.player-status {
-  font-size: 12px;
-  opacity: 0.85;
-  font-style: italic;
-}
-
 /* ================= FOOTER ================= */
 
 .lobby-footer {
@@ -161,31 +145,6 @@
   z-index: 2;
   text-shadow: 0 6px 16px rgba(0,0,0,0.7);
   letter-spacing: 0.4px;
-}
-
-/* ================= COUNTDOWN ================= */
-
-.countdown {
-  font-size: 22px;
-  animation: pulse 1s infinite;
-}
-
-.start-hint {
-  opacity: 0.9;
-}
-
-.waiting-text {
-  opacity: 0.75;
-}
-
-.starting-text {
-  opacity: 0.85;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-  100% { transform: scale(1); }
 }
 
 /* ================= LOADING ================= */

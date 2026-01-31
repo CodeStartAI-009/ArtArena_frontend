@@ -10,35 +10,38 @@ import Faq from "./pages/Home/Faq";
 import Terms from "./pages/Home/Terms";
 import Privacy from "./pages/Home/Privacy";
 import AuthSuccess from "./pages/AuthSuccess";
+
 import { useAuth } from "./context/AuthContext";
 import useAutoAuth from "./hooks/useAutoAuth";
 import AdSenseLoader from "./AdSense";
+
 export default function App() {
-  const { user, authReady } = useAuth();
+  const { authReady } = useAuth();
 
   // 🔐 auto auth (guest / token)
   useAutoAuth();
 
-  // ⛔ DO NOT RENDER APP UNTIL AUTH IS FULLY READY
-  if (!user || !authReady) {
+  // ✅ SHOW SPLASH ONLY WHILE AUTH IS LOADING
+  if (!authReady) {
     return <Splash />;
   }
 
   return (
     <>
-    <AdSenseLoader />
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/lobby/:code" element={<Lobby />} />
-      <Route path="/game/:code" element={<Game />} />
-      <Route path="/store" element={<Store />} />
-      <Route path="/auth/success" element={<AuthSuccess />} />
-      <Route path="/features" element={<Features />} />
-      <Route path="/faq" element={<Faq />} />
-      <Route path="/terms" element={<Terms />} />
-      <Route path="/privacy" element={<Privacy />} />
+      {/* ✅ Load AdSense ONCE globally */}
+      <AdSenseLoader />
 
-    </Routes>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/lobby/:code" element={<Lobby />} />
+        <Route path="/game/:code" element={<Game />} />
+        <Route path="/store" element={<Store />} />
+        <Route path="/auth/success" element={<AuthSuccess />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/faq" element={<Faq />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
+      </Routes>
     </>
   );
 }
