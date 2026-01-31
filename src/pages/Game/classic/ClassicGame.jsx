@@ -1,4 +1,4 @@
- // src/pages/Game/classic/ClassicGame.jsx
+// src/pages/Game/classic/ClassicGame.jsx
 
 import useGameStore from "../store/store";
 
@@ -9,10 +9,12 @@ import GuessInput from "../components/GuessInput";
 import WordMask from "../components/WordMask";
 import StartGuessingButton from "../components/StartGuessingButton";
 import WordChoice from "../components/WordChoice";
+import Timer from "../components/Timer";
 
 export default function ClassicGame({ boardImage }) {
   const { game, isDrawer, wordChoices } = useGameStore();
 
+  // Safety guard
   if (!game) return null;
 
   const guessingAllowed = game.guessingAllowed === true;
@@ -21,6 +23,9 @@ export default function ClassicGame({ boardImage }) {
     <div className="game-screen">
       {/* ================= TOP BAR ================= */}
       <TopBar round={game.round} />
+
+      {/* ================= TIMER ================= */}
+      <Timer />
 
       {/* ================= PLAYER LIST ================= */}
       <PlayerList players={game.players} />
@@ -38,11 +43,11 @@ export default function ClassicGame({ boardImage }) {
       />
 
       {/* ================= DRAWER CONTROLS ================= */}
-      {isDrawer && wordChoices.length > 0 && (
+      {isDrawer && wordChoices?.length > 0 && (
         <WordChoice roomCode={game.code} />
       )}
 
-      {isDrawer && !guessingAllowed && wordChoices.length === 0 && (
+      {isDrawer && !guessingAllowed && (!wordChoices || wordChoices.length === 0) && (
         <StartGuessingButton roomCode={game.code} />
       )}
 

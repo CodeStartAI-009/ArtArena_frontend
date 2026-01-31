@@ -204,6 +204,77 @@
   background: #ffffff;
   color: #000;
 }
+/* Timer.css */
+.game-timer {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 900;
+}
+
+.timer-label {
+  background: rgba(0, 0, 0, 0.55);
+  padding: 6px 12px;
+  border-radius: 12px;
+  color: white;
+  font-size: 14px;
+}
+
+.timer-circle {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 4px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  font-size: 18px;
+}
+/* ================= TOP BAR ================= */
+
+.top-bar {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  padding: 10px 26px;
+  border-radius: 999px;
+
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+
+  color: #ffffff;
+  text-transform: uppercase;
+
+  background: linear-gradient(
+    180deg,
+    #3b82f6,
+    #1e40af
+  );
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    0 8px 20px rgba(0, 0, 0, 0.45);
+
+  z-index: 5;
+  user-select: none;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 600px) {
+  .top-bar {
+    font-size: 15px;
+    padding: 8px 20px;
+  }
+}
 
 .guess-input:disabled {
   background: #e0e0e0;
