@@ -1,21 +1,16 @@
-// src/components/AdSense.jsx
 import { useEffect } from "react";
 
-export default function AdSense() {
+export default function AdSenseLoader() {
   useEffect(() => {
-    if (window.adsbygoogle) {
-      window.adsbygoogle.push({});
-    }
+    if (window.adsbygoogle) return;
+
+    const script = document.createElement("script");
+    script.src =
+      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    document.body.appendChild(script);
   }, []);
 
-  return (
-    <ins
-      className="adsbygoogle"
-      style={{ display: "block" }}
-      data-ad-client="ca-pub-8525673711213815"
-      data-ad-slot="XXXXXXXXXX"
-      data-ad-format="auto"
-      data-full-width-responsive="true"
-    />
-  );
+  return null;
 }

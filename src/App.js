@@ -12,7 +12,7 @@ import Privacy from "./pages/Home/Privacy";
 import AuthSuccess from "./pages/AuthSuccess";
 import { useAuth } from "./context/AuthContext";
 import useAutoAuth from "./hooks/useAutoAuth";
-
+import AdSenseLoader from "./AdSense";
 export default function App() {
   const { user, authReady } = useAuth();
 
@@ -25,6 +25,8 @@ export default function App() {
   }
 
   return (
+    <>
+    <AdSenseLoader />
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/lobby/:code" element={<Lobby />} />
@@ -37,5 +39,6 @@ export default function App() {
       <Route path="/privacy" element={<Privacy />} />
 
     </Routes>
+    </>
   );
 }

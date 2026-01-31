@@ -6,7 +6,7 @@ import AuthModal from "./AuthModal";
 import CreateGameModal from "./CreateGameModal";
 import JoinGameModal from "./JoinGameModal";
 import { getSocket } from "../../socket/socket";
-import AdSense from "../../AdSense";
+
 /* ASSETS */
 import companyLogo from "../../assets/logo/company.jpeg";
 import coinIcon from "../../assets/icons/coins.png";
@@ -45,14 +45,7 @@ export default function Home() {
       document.exitFullscreen().catch(() => {});
     }
   };
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src =
-      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
-    script.async = true;
-    script.crossOrigin = "anonymous";
-    document.body.appendChild(script);
-  }, []);
+
   /* ================= SOCKET STATUS ================= */
   useEffect(() => {
     const onConnect = () => setSocketReady(true);
@@ -119,7 +112,7 @@ export default function Home() {
           🎁 Free <span className="badge">1</span>
         </button>
       </div>
-      
+
       {/* ================= LEVEL ================= */}
       <div className="level-section">
         <div className="level-badge">Lv {user.level}</div>
@@ -133,9 +126,7 @@ export default function Home() {
           <span className="xp-text">{user.xp} / 100 XP</span>
         </div>
       </div>
-      <div style={{ maxWidth: 900, margin: "20px auto" }}>
-        <AdSense />
-      </div>
+
       {/* ================= LEFT PANEL ================= */}
       <div className="left-panel">
         <div className="economy-box clickable" onClick={() => navigate("/store")}>
