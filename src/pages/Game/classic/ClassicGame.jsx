@@ -1,17 +1,11 @@
- // src/pages/Game/classic/ClassicGame.jsx
-
 import useGameStore from "../store/store";
 
 import TopBar from "../components/TopBar";
 import PlayerList from "../components/PlayerList";
 import DrawingCanvas from "../components/DrawingCanvas";
 import GuessInput from "../components/GuessInput";
-import WordMask from "../components/WordMask";
 import StartGuessingButton from "../components/StartGuessingButton";
 import WordChoice from "../components/WordChoice";
- 
-
-
 
 export default function ClassicGame({ boardImage }) {
   const { game, isDrawer, wordChoices } = useGameStore();
@@ -22,18 +16,18 @@ export default function ClassicGame({ boardImage }) {
 
   return (
     <div className="game-screen">
-      {/* ================= TOP BAR ================= */}
-      <TopBar round={game.round} />
+      {/* ================= TOP BAR (WITH WORD MASK) ================= */}
+      <TopBar
+  round={game.round}
+  wordLength={game.wordLength}
+  revealedLetters={game.revealedLetters}
+  coins={game.me?.coins}
+/>
+
 
       {/* ================= PLAYER LIST ================= */}
       <PlayerList players={game.players} />
 
-      {/* ================= WORD MASK ================= */}
-      <WordMask
-        wordLength={game.wordLength ?? 0}
-        revealedLetters={game.revealedLetters ?? []}
-      />
-       
       {/* ================= DRAWING BOARD ================= */}
       <DrawingCanvas
         roomCode={game.code}

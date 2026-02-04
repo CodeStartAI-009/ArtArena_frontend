@@ -5,7 +5,6 @@
 .game-root {
   width: 100vw;
   height: 100vh;
-
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -44,17 +43,19 @@
 .game-screen {
   position: relative;
   z-index: 2;
-
   width: 100%;
   height: 100%;
 
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  /* ✅ SPACE FOR TOP BAR */
+  padding-top: 90px;
 }
 
 /* ===============================
-   TOP BAR (ROUND)
+   TOP BAR
 ================================ */
 
 .top-bar {
@@ -63,48 +64,31 @@
   left: 50%;
   transform: translateX(-50%);
 
-  padding: 10px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  min-width: 420px;
+  padding: 10px 24px;
   border-radius: 999px;
 
-  font-size: 18px;
-  font-weight: 900;
+  font-size: 16px;
+  font-weight: 800;
   letter-spacing: 0.6px;
   text-transform: uppercase;
 
-  color: #ffffff;
   background: linear-gradient(180deg, #3b82f6, #1e40af);
-
   box-shadow:
     inset 0 2px 0 rgba(255,255,255,0.25),
     0 8px 20px rgba(0,0,0,0.45);
 
   z-index: 6;
-  user-select: none;
 }
 
-/* ===============================
-   TIMER (TOP RIGHT)
-================================ */
-
-.timer {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 6;
-
-  background: #ffb703;
-  color: #000;
-
-  padding: 8px 16px;
-  border-radius: 999px;
-
-  font-size: 18px;
-  font-weight: 900;
-
-  box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.35),
-    0 6px 16px rgba(0,0,0,0.45);
-}
+.top-bar-left { white-space: nowrap; }
+.top-bar-center { flex: 1; display: flex; justify-content: center; }
+.top-bar-right { white-space: nowrap; }
 
 /* ===============================
    PLAYER LIST
@@ -149,25 +133,14 @@
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin: 12px 0;
 }
 
 .word-letter {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  width: 28px;
+  width: 26px;
   text-align: center;
-  border-bottom: 3px solid rgba(255,255,255,0.5);
-  color: #fff;
-}
-
-.word-letter.revealed {
-  border-bottom-color: transparent;
-}
-
-.word-letter.space {
-  border-bottom: none;
-  width: 16px;
+  border-bottom: 3px solid rgba(255,255,255,0.6);
 }
 
 /* ===============================
@@ -175,35 +148,19 @@
 ================================ */
 
 .canvas-wrapper {
-  position: relative;
   z-index: 3;
 
   width: 800px;
   height: 420px;
-
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
   border-radius: 18px;
   overflow: hidden;
+
+  /* ✅ CLEAN GAP BELOW TOP BAR */
+  margin-top: 24px;
 
   box-shadow:
     inset 0 2px 0 rgba(255,255,255,0.25),
     0 18px 40px rgba(0,0,0,0.55);
-}
-
-.drawing-canvas {
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  cursor: crosshair;
-  touch-action: none;
-}
-
-.drawing-canvas.disabled {
-  pointer-events: none;
-  opacity: 0.75;
 }
 
 /* ===============================
@@ -213,7 +170,6 @@
 .guess-input {
   margin-top: 18px;
   width: 420px;
-
   padding: 14px 18px;
   border-radius: 16px;
   border: none;
@@ -221,23 +177,54 @@
   font-size: 18px;
   font-weight: 700;
   text-align: center;
-
-  background: #ffffff;
-  color: #000;
 }
 
-.guess-input:disabled {
-  background: #e0e0e0;
+/* =====================================================
+   WORD CHOICE POPUP
+===================================================== */
+
+.word-choice {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+}
+
+.word-choice > * {
+  background: linear-gradient(
+    180deg,
+    rgba(30, 41, 59, 0.95),
+    rgba(15, 23, 42, 0.95)
+  );
+
+  padding: 22px 26px;
+  border-radius: 18px;
+  min-width: 320px;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.15),
+    0 24px 60px rgba(0,0,0,0.7);
 }
 
 /* ===============================
-   LOADING
+   START GUESSING BUTTON
 ================================ */
 
-.game-loading {
-  margin-top: 40vh;
-  font-size: 22px;
-  font-weight: 800;
+.start-guessing-btn {
+  margin-top: 16px;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 900;
+
+  background: linear-gradient(180deg, #22c55e, #16a34a);
+  cursor: pointer;
 }
 
 /* ===============================
@@ -245,28 +232,18 @@
 ================================ */
 
 @media (max-width: 900px) {
-  .player-list {
-    display: none;
-  }
-
-  .canvas-wrapper {
-    width: 92vw;
-    height: 50vh;
-  }
-
-  .guess-input {
-    width: 92vw;
-  }
+  .player-list { display: none; }
+  .canvas-wrapper { width: 92vw; height: 50vh; }
+  .guess-input { width: 92vw; }
 }
 
 @media (max-width: 600px) {
   .top-bar {
-    font-size: 15px;
-    padding: 8px 20px;
+    width: 92vw;
+    font-size: 14px;
   }
 
-  .timer {
-    font-size: 16px;
-    padding: 6px 14px;
+  .game-screen {
+    padding-top: 80px;
   }
 }
