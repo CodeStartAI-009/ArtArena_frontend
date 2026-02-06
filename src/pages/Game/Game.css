@@ -172,6 +172,118 @@
 .together-instructions li {
   margin: 4px 0;
 }
+/* =========================
+   COLOR PICKER (FIXED)
+========================= */
+
+.color-picker {
+  position: relative;
+  z-index: 5;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin: 12px 0 16px;
+  padding: 8px 12px;
+
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  user-select: none;
+  pointer-events: auto;
+}
+
+.color-picker label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.color-picker input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 36px;
+  height: 36px;
+  padding: 0;
+
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+/* Chrome / Edge */
+.color-picker input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-picker input[type="color"]::-webkit-color-swatch {
+  border-radius: 8px;
+  border: 2px solid #ddd;
+}
+
+/* Firefox */
+.color-picker input[type="color"]::-moz-color-swatch {
+  border-radius: 8px;
+  border: 2px solid #ddd;
+}
+
+/* Hover / focus */
+.color-picker input[type="color"]:hover,
+.color-picker input[type="color"]:focus {
+  transform: scale(1.05);
+}
+
+.color-picker input[type="color"]:focus-visible {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+}
+
+/* ===============================
+   CANVAS (SAFE)
+================================ */
+
+.canvas-wrapper {
+  z-index: 3;
+}
+
+.drawing-canvas {
+  touch-action: none;
+}
+.tool-bar {
+  position: relative;
+  z-index: 5;
+
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+
+  pointer-events: auto;
+}
+
+.tool-bar button {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+
+  background: #1e293b;
+  color: #fff;
+  border: none;
+}
+
+.tool-bar button.active {
+  background: #22c55e;
+  color: #000;
+}
 
 /* ===============================
    CANVAS

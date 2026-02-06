@@ -1,6 +1,6 @@
 // src/pages/Game/together/DrawingGame.jsx
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { getSocket } from "../../../socket/socket";
 import useGameStore from "../store/store";
 import "../Game.css";
@@ -11,9 +11,11 @@ export default function DrawingGame({ boardImage }) {
   const lastPointRef = useRef(null);
   const isDrawingRef = useRef(false);
 
+  const [color, setColor] = useState("#000000");
+  const [tool, setTool] = useState("draw"); // draw | erase
+
   const socket = getSocket();
   const { game } = useGameStore();
-
   const roomCode = game?.code;
 
   /* =========================
@@ -48,9 +50,11 @@ export default function DrawingGame({ boardImage }) {
     const ctx = canvas.getContext("2d");
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    ctx.lineWidth = 3;
     ctx.lineCap = "round";
+    ctx.lineJoin = "round"; // ✅ CRITICAL FIX
+    ctx.lineWidth = 3;
     ctx.strokeStyle = "#000";
+    ctx.globalCompositeOperation = "source-over";
 
     ctxRef.current = ctx;
   };
@@ -64,21 +68,33 @@ export default function DrawingGame({ boardImage }) {
     setupCanvas();
     window.addEventListener("resize", setupCanvas);
 
-    const drawStroke = ({ x, y, prevX, prevY }) => {
+    const drawStroke = ({ x, y, prevX, prevY, color, tool }) => {
       const ctx = ctxRef.current;
       if (!ctx || prevX == null || prevY == null) return;
+
+      ctx.save();
+
+      if (tool === "erase") {
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.lineWidth = 24; // ✅ FIXED
+      } else {
+        ctx.globalCompositeOperation = "source-over";
+        ctx.strokeStyle = color || "#000";
+        ctx.lineWidth = 3;
+      }
 
       ctx.beginPath();
       ctx.moveTo(prevX, prevY);
       ctx.lineTo(x, y);
       ctx.stroke();
+
+      ctx.restore();
     };
 
     const clearCanvas = () => {
       const ctx = ctxRef.current;
       const canvas = canvasRef.current;
       if (!ctx || !canvas) return;
-
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
 
@@ -91,7 +107,6 @@ export default function DrawingGame({ boardImage }) {
     socket.on("DRAW_SYNC", syncDrawing);
     socket.on("CLEAR_CANVAS", clearCanvas);
 
-    // 🔑 Restore drawing on reload
     socket.emit("REQUEST_DRAW_SYNC", { code: roomCode });
 
     return () => {
@@ -100,13 +115,16 @@ export default function DrawingGame({ boardImage }) {
       socket.off("DRAW_SYNC", syncDrawing);
       socket.off("CLEAR_CANVAS", clearCanvas);
     };
-  }, [socket, roomCode]);
+  }, [roomCode, socket]);
 
   /* =========================
      HELPERS
   ========================== */
   const getPoint = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+
+    const rect = canvas.getBoundingClientRect();
     const t = e.touches?.[0];
 
     return {
@@ -116,7 +134,7 @@ export default function DrawingGame({ boardImage }) {
   };
 
   const canDrawHere = (x) => {
-    if (!isReady) return false;
+    if (!isReady || !canvasRef.current) return false;
 
     const mid =
       canvasRef.current.width /
@@ -134,7 +152,7 @@ export default function DrawingGame({ boardImage }) {
     e.preventDefault();
 
     const point = getPoint(e);
-    if (!canDrawHere(point.x)) return;
+    if (!point || !canDrawHere(point.x)) return;
 
     isDrawingRef.current = true;
     lastPointRef.current = point;
@@ -145,16 +163,29 @@ export default function DrawingGame({ boardImage }) {
     e.preventDefault();
 
     const point = getPoint(e);
-    if (!canDrawHere(point.x)) return;
+    if (!point || !canDrawHere(point.x)) return;
 
     const prev = lastPointRef.current;
-    if (!prev) return;
-
     const ctx = ctxRef.current;
+    if (!prev || !ctx) return;
+
+    ctx.save();
+
+    if (tool === "erase") {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.lineWidth = 24;
+    } else {
+      ctx.globalCompositeOperation = "source-over";
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+    }
+
     ctx.beginPath();
     ctx.moveTo(prev.x, prev.y);
     ctx.lineTo(point.x, point.y);
     ctx.stroke();
+
+    ctx.restore();
 
     socket.emit("DRAW", {
       code: roomCode,
@@ -162,6 +193,8 @@ export default function DrawingGame({ boardImage }) {
       y: point.y,
       prevX: prev.x,
       prevY: prev.y,
+      color,
+      tool,
     });
 
     lastPointRef.current = point;
@@ -184,7 +217,6 @@ export default function DrawingGame({ boardImage }) {
   ========================== */
   return (
     <>
-      {/* 👇 PLAYER INSTRUCTIONS */}
       <div className="together-instructions">
         <h3>Together Drawing Mode</h3>
         <ul>
@@ -198,13 +230,41 @@ export default function DrawingGame({ boardImage }) {
         </ul>
       </div>
 
-      {/* 👇 CANVAS */}
+      {/* TOOLBAR */}
+      <div className="tool-bar">
+        <button
+          className={tool === "draw" ? "active" : ""}
+          onClick={() => setTool("draw")}
+        >
+          ✏️ Draw
+        </button>
+        <button
+          className={tool === "erase" ? "active" : ""}
+          onClick={() => setTool("erase")}
+        >
+          🧽 Erase
+        </button>
+      </div>
+
+      {/* COLOR PICKER */}
+      {tool === "draw" && (
+        <div className="color-picker">
+          <label>
+            🎨 Select Color:
+            <input
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+            />
+          </label>
+        </div>
+      )}
+
+      {/* CANVAS */}
       <div
         className="canvas-wrapper"
         style={{
-          backgroundImage: boardImage
-            ? `url(${boardImage})`
-            : "none",
+          backgroundImage: boardImage ? `url(${boardImage})` : "none",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -221,8 +281,6 @@ export default function DrawingGame({ boardImage }) {
           onTouchMove={draw}
           onTouchEnd={stopDrawing}
         />
-
-        {/* Visual center divider */}
         <div className="canvas-divider" />
       </div>
     </>
