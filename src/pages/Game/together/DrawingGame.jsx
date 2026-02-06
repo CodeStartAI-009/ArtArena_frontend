@@ -1,18 +1,23 @@
- import { useEffect, useRef } from "react";
+// src/pages/Game/together/DrawingGame.jsx
+
+import { useRef, useEffect } from "react";
 import { getSocket } from "../../../socket/socket";
 import useGameStore from "../store/store";
 import "../Game.css";
 
-export default function DrawingGame() {
-  const socket = getSocket();
+export default function DrawingGame({ boardImage }) {
   const canvasRef = useRef(null);
-  const drawingRef = useRef(false);
+  const ctxRef = useRef(null);
   const lastPointRef = useRef(null);
+  const isDrawingRef = useRef(false);
 
+  const socket = getSocket();
   const { game } = useGameStore();
 
+  const roomCode = game?.code;
+
   /* =========================
-     SAFE FLAGS (NO EARLY RETURN)
+     SAFE FLAGS
   ========================== */
   const isReady =
     !!game &&
@@ -20,126 +25,206 @@ export default function DrawingGame() {
     Array.isArray(game.players) &&
     game.players.length === 2;
 
-  const CANVAS_WIDTH = 800;
-  const CANVAS_HEIGHT = 400;
-  const MID_X = CANVAS_WIDTH / 2;
-
   const isLeftPlayer =
     isReady && game.players[0]?.id === game.selfId;
 
   /* =========================
-     RECEIVE DRAW EVENTS
+     CANVAS SETUP (RETINA SAFE)
+  ========================== */
+  const setupCanvas = () => {
+    const canvas = canvasRef.current;
+    const wrapper = canvas?.parentElement;
+    if (!canvas || !wrapper) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const rect = wrapper.getBoundingClientRect();
+
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
+
+    ctxRef.current = ctx;
+  };
+
+  /* =========================
+     SOCKET + INIT (WITH SYNC)
   ========================== */
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!roomCode) return;
 
-    const ctx = canvasRef.current.getContext("2d");
+    setupCanvas();
+    window.addEventListener("resize", setupCanvas);
 
-    const onDraw = ({ x, y, prevX, prevY }) => {
-      if (prevX == null || prevY == null) return;
+    const drawStroke = ({ x, y, prevX, prevY }) => {
+      const ctx = ctxRef.current;
+      if (!ctx || prevX == null || prevY == null) return;
 
       ctx.beginPath();
       ctx.moveTo(prevX, prevY);
       ctx.lineTo(x, y);
-      ctx.strokeStyle = "#000";
-      ctx.lineWidth = 3;
-      ctx.lineCap = "round";
       ctx.stroke();
     };
 
-    socket.on("DRAW", onDraw);
-    return () => socket.off("DRAW", onDraw);
-  }, [socket]);
+    const clearCanvas = () => {
+      const ctx = ctxRef.current;
+      const canvas = canvasRef.current;
+      if (!ctx || !canvas) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+
+    const syncDrawing = (strokes = []) => {
+      clearCanvas();
+      strokes.forEach(drawStroke);
+    };
+
+    socket.on("DRAW", drawStroke);
+    socket.on("DRAW_SYNC", syncDrawing);
+    socket.on("CLEAR_CANVAS", clearCanvas);
+
+    // 🔑 Restore drawing on reload
+    socket.emit("REQUEST_DRAW_SYNC", { code: roomCode });
+
+    return () => {
+      window.removeEventListener("resize", setupCanvas);
+      socket.off("DRAW", drawStroke);
+      socket.off("DRAW_SYNC", syncDrawing);
+      socket.off("CLEAR_CANVAS", clearCanvas);
+    };
+  }, [socket, roomCode]);
 
   /* =========================
      HELPERS
   ========================== */
-  const getPos = (e) => {
+  const getPoint = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
+    const t = e.touches?.[0];
+
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: (t ? t.clientX : e.clientX) - rect.left,
+      y: (t ? t.clientY : e.clientY) - rect.top,
     };
   };
 
   const canDrawHere = (x) => {
     if (!isReady) return false;
-    return isLeftPlayer ? x <= MID_X : x >= MID_X;
+
+    const mid =
+      canvasRef.current.width /
+      (window.devicePixelRatio || 1) /
+      2;
+
+    return isLeftPlayer ? x <= mid : x >= mid;
   };
 
   /* =========================
-     MOUSE EVENTS
+     DRAW EVENTS
   ========================== */
-  const onMouseDown = (e) => {
+  const startDrawing = (e) => {
     if (!isReady) return;
+    e.preventDefault();
 
-    const { x, y } = getPos(e);
-    if (!canDrawHere(x)) return;
+    const point = getPoint(e);
+    if (!canDrawHere(point.x)) return;
 
-    drawingRef.current = true;
-    lastPointRef.current = { x, y };
+    isDrawingRef.current = true;
+    lastPointRef.current = point;
   };
 
-  const onMouseMove = (e) => {
-    if (!drawingRef.current || !isReady) return;
+  const draw = (e) => {
+    if (!isDrawingRef.current || !isReady) return;
+    e.preventDefault();
 
-    const { x, y } = getPos(e);
-    if (!canDrawHere(x)) return;
+    const point = getPoint(e);
+    if (!canDrawHere(point.x)) return;
 
     const prev = lastPointRef.current;
     if (!prev) return;
 
+    const ctx = ctxRef.current;
+    ctx.beginPath();
+    ctx.moveTo(prev.x, prev.y);
+    ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+
     socket.emit("DRAW", {
-      code: game.code,
-      x,
-      y,
+      code: roomCode,
+      x: point.x,
+      y: point.y,
       prevX: prev.x,
       prevY: prev.y,
     });
 
-    lastPointRef.current = { x, y };
+    lastPointRef.current = point;
   };
 
-  const onMouseUp = () => {
-    drawingRef.current = false;
+  const stopDrawing = () => {
+    isDrawingRef.current = false;
     lastPointRef.current = null;
   };
 
   /* =========================
-     RENDER
+     LOADING UI
   ========================== */
   if (!isReady) {
-    return (
-      <div className="game-loading">
-        Waiting for players…
-      </div>
-    );
+    return <div className="game-loading">Waiting for players…</div>;
   }
 
+  /* =========================
+     RENDER
+  ========================== */
   return (
-    <div className="game-root">
-      <h2 className="together-title">Together Mode – Drawing</h2>
-
-      <div className="split-info">
-        {isLeftPlayer
-          ? "You draw the LEFT side"
-          : "You draw the RIGHT side"}
+    <>
+      {/* 👇 PLAYER INSTRUCTIONS */}
+      <div className="together-instructions">
+        <h3>Together Drawing Mode</h3>
+        <ul>
+          <li>
+            {isLeftPlayer
+              ? "You can draw only on the LEFT side of the canvas."
+              : "You can draw only on the RIGHT side of the canvas."}
+          </li>
+          <li>Work together to complete the drawing.</li>
+          <li>Your drawing is synced live.</li>
+        </ul>
       </div>
 
-      <div className="canvas-wrapper">
+      {/* 👇 CANVAS */}
+      <div
+        className="canvas-wrapper"
+        style={{
+          backgroundImage: boardImage
+            ? `url(${boardImage})`
+            : "none",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
         <canvas
           ref={canvasRef}
-          width={CANVAS_WIDTH}
-          height={CANVAS_HEIGHT}
           className="drawing-canvas"
-          onMouseDown={onMouseDown}
-          onMouseMove={onMouseMove}
-          onMouseUp={onMouseUp}
-          onMouseLeave={onMouseUp}
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
         />
 
+        {/* Visual center divider */}
         <div className="canvas-divider" />
       </div>
-    </div>
+    </>
   );
 }
