@@ -1,4 +1,5 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 import Splash from "./pages/Splash/Splash";
 import Home from "./pages/Home/Home";
@@ -17,18 +18,32 @@ import AdSenseLoader from "./AdSense";
 
 export default function App() {
   const { authReady } = useAuth();
+  const location = useLocation();
 
-  // 🔐 auto auth (guest / token)
+  /* ================= CAPTURE REFERRAL CODE ================= */
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const ref = params.get("ref");
+
+    if (ref) {
+      // store ONLY once per session
+      if (!sessionStorage.getItem("referralCode")) {
+        sessionStorage.setItem("referralCode", ref);
+      }
+    }
+  }, [location.search]);
+
+  /* ================= AUTO AUTH (guest / token) ================= */
   useAutoAuth();
 
-  // ✅ SHOW SPLASH ONLY WHILE AUTH IS LOADING
+  /* ================= SPLASH ================= */
   if (!authReady) {
     return <Splash />;
   }
 
   return (
     <>
-      {/* ✅ Load AdSense ONCE globally */}
+      {/* Load AdSense ONCE globally */}
       <AdSenseLoader />
 
       <Routes>
@@ -41,6 +56,9 @@ export default function App() {
         <Route path="/faq" element={<Faq />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
+
+        {/* fallback */}
+        <Route path="*" element={<Home />} />
       </Routes>
     </>
   );
