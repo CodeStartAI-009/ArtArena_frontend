@@ -1,100 +1,143 @@
-import { useEffect, useRef } from "react";
+// src/pages/Game/together/OpenCanvasGame.jsx
+
+import { useRef, useEffect } from "react";
 import { getSocket } from "../../../socket/socket";
 import useGameStore from "../store/store";
 import "../Game.css";
 
-export default function OpenCanvasGame() {
-  const socket = getSocket();
+export default function OpenCanvasGame({ boardImage }) {
   const canvasRef = useRef(null);
-  const drawingRef = useRef(false);
+  const ctxRef = useRef(null);
   const lastPointRef = useRef(null);
+  const isDrawingRef = useRef(false);
 
+  const socket = getSocket();
   const { game } = useGameStore();
 
+  const roomCode = game?.code;
+
   /* =========================
-     SAFE READY FLAG
+     CANVAS SETUP (RETINA SAFE)
   ========================== */
-  const isReady =
-    !!game &&
-    !!game.selfId &&
-    Array.isArray(game.players) &&
-    game.players.length >= 2;
+  const setupCanvas = () => {
+    const canvas = canvasRef.current;
+    const wrapper = canvas?.parentElement;
+    if (!canvas || !wrapper) return;
 
-  const CANVAS_WIDTH = 500;
-  const CANVAS_HEIGHT = 400;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = wrapper.getBoundingClientRect();
+
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ctx.lineWidth = 4;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
+
+    ctxRef.current = ctx;
+  };
 
   /* =========================
-     RECEIVE DRAW EVENTS
+     SOCKET + INIT
   ========================== */
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!roomCode) return;
 
-    const ctx = canvasRef.current.getContext("2d");
+    setupCanvas();
+    window.addEventListener("resize", setupCanvas);
 
-    const onDraw = ({ x, y, prevX, prevY }) => {
-      if (prevX == null || prevY == null) return;
+    const drawStroke = ({ x, y, prevX, prevY }) => {
+      const ctx = ctxRef.current;
+      if (!ctx || prevX == null || prevY == null) return;
 
       ctx.beginPath();
       ctx.moveTo(prevX, prevY);
       ctx.lineTo(x, y);
-      ctx.strokeStyle = "#222";
-      ctx.lineWidth = 3;
-      ctx.lineCap = "round";
       ctx.stroke();
     };
 
-    socket.on("DRAW", onDraw);
-    return () => socket.off("DRAW", onDraw);
-  }, [socket]);
+    const clearCanvas = () => {
+      const ctx = ctxRef.current;
+      const canvas = canvasRef.current;
+      if (!ctx || !canvas) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+
+    socket.on("DRAW", drawStroke);
+    socket.on("CLEAR_CANVAS", clearCanvas);
+
+    return () => {
+      window.removeEventListener("resize", setupCanvas);
+      socket.off("DRAW", drawStroke);
+      socket.off("CLEAR_CANVAS", clearCanvas);
+    };
+  }, [socket, roomCode]);
 
   /* =========================
      HELPERS
   ========================== */
-  const getPos = (e) => {
+  const getPoint = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
+    const t = e.touches?.[0];
+
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: (t ? t.clientX : e.clientX) - rect.left,
+      y: (t ? t.clientY : e.clientY) - rect.top,
     };
   };
 
   /* =========================
-     MOUSE EVENTS
+     DRAW EVENTS (EVERYONE)
   ========================== */
-  const onMouseDown = (e) => {
-    if (!isReady) return;
+  const startDrawing = (e) => {
+    if (!game) return;
+    e.preventDefault();
 
-    drawingRef.current = true;
-    lastPointRef.current = getPos(e);
+    isDrawingRef.current = true;
+    lastPointRef.current = getPoint(e);
   };
 
-  const onMouseMove = (e) => {
-    if (!drawingRef.current || !isReady) return;
+  const draw = (e) => {
+    if (!isDrawingRef.current || !game) return;
+    e.preventDefault();
 
-    const { x, y } = getPos(e);
+    const point = getPoint(e);
     const prev = lastPointRef.current;
     if (!prev) return;
 
+    const ctx = ctxRef.current;
+    ctx.beginPath();
+    ctx.moveTo(prev.x, prev.y);
+    ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+
     socket.emit("DRAW", {
-      code: game.code,
-      x,
-      y,
+      code: roomCode,
+      x: point.x,
+      y: point.y,
       prevX: prev.x,
       prevY: prev.y,
     });
 
-    lastPointRef.current = { x, y };
+    lastPointRef.current = point;
   };
 
-  const onMouseUp = () => {
-    drawingRef.current = false;
+  const stopDrawing = () => {
+    isDrawingRef.current = false;
     lastPointRef.current = null;
   };
 
   /* =========================
-     RENDER
+     LOADING UI (SAFE)
   ========================== */
-  if (!isReady) {
+  if (!game) {
     return (
       <div className="game-loading">
         Waiting for players…
@@ -102,24 +145,32 @@ export default function OpenCanvasGame() {
     );
   }
 
+  /* =========================
+     RENDER
+  ========================== */
   return (
-    <div className="game-root">
-      <h2 className="together-title">Together Mode – Open Canvas</h2>
-
+    <div
+      className="canvas-wrapper"
+      style={{
+        backgroundImage: boardImage
+          ? `url(${boardImage})`
+          : "none",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       <canvas
         ref={canvasRef}
-        width={CANVAS_WIDTH}
-        height={CANVAS_HEIGHT}
         className="drawing-canvas"
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseUp}
+        onMouseDown={startDrawing}
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+        onMouseLeave={stopDrawing}
+        onTouchStart={startDrawing}
+        onTouchMove={draw}
+        onTouchEnd={stopDrawing}
       />
-
-      <p className="together-hint">
-        Draw freely together — no sides, no limits
-      </p>
     </div>
   );
 }
