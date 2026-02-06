@@ -24,13 +24,12 @@ API.interceptors.request.use((config) => {
    GUEST LOGIN (WITH REFERRAL)
 ========================= */
 export const guestLogin = (guestId) => {
-  const referralCode = localStorage.getItem("referralCode");
+  // ✅ MUST MATCH App.jsx
+  const referralCode = sessionStorage.getItem("referralCode");
 
   return API.post(
     "/auth/guest",
-    {
-      referralCode, // 🔗 send referral if exists
-    },
+    referralCode ? { referralCode } : {}, // send only if exists
     {
       headers: guestId ? { "x-guest-id": guestId } : {},
     }

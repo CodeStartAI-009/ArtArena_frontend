@@ -20,21 +20,18 @@ export default function App() {
   const { authReady } = useAuth();
   const location = useLocation();
 
-  /* ================= CAPTURE REFERRAL CODE ================= */
+  /* ================= CAPTURE REFERRAL CODE (RUN FIRST) ================= */
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const ref = params.get("ref");
 
-    if (ref) {
-      // store ONLY once per session
-      if (!sessionStorage.getItem("referralCode")) {
-        sessionStorage.setItem("referralCode", ref);
-      }
+    if (ref && !sessionStorage.getItem("referralCode")) {
+      sessionStorage.setItem("referralCode", ref);
     }
   }, [location.search]);
 
   /* ================= AUTO AUTH (guest / token) ================= */
-  useAutoAuth();
+  useAutoAuth(); // ✅ runs AFTER referral is stored
 
   /* ================= SPLASH ================= */
   if (!authReady) {
@@ -43,7 +40,7 @@ export default function App() {
 
   return (
     <>
-      {/* Load AdSense ONCE globally */}
+      {/* ✅ Load AdSense ONCE globally */}
       <AdSenseLoader />
 
       <Routes>
