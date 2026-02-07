@@ -250,7 +250,7 @@ export default function Home() {
 
         <div className="footer-icons">
           <button onClick={() => setShowHowTo(true)}><FaCog /></button>
-          <button onClick={() => window.open("https://discord.gg/artarena")}><FaDiscord /></button>
+          <button onClick={() => window.open("https://discord.gg/5rPSTx7n")}><FaDiscord /></button>
           <button onClick={toggleFullscreen}><FaExpand /></button>
           <img src={companyLogo} alt="Logo" />
         </div>

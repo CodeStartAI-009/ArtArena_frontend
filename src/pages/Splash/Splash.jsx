@@ -35,7 +35,7 @@ export default function Splash() {
 
           {/* DISCORD */}
           <a
-            href="https://discord.gg/artarena"
+            href="https://discord.gg/5rPSTx7n"
             target="_blank"
             rel="noreferrer"
           >
