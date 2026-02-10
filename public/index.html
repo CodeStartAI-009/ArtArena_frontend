@@ -5,40 +5,62 @@
 
     <title>Art Arena</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <!-- ✅ GAME-FRIENDLY VIEWPORT -->
     <meta
-      name="description"
-      content="Art Arena web application"
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
 
+    <!-- ✅ THEME / STATUS BAR -->
+    <meta name="theme-color" content="#000000" />
+
+    <!-- ✅ SEO -->
+    <meta
+      name="description"
+      content="Art Arena — a multiplayer drawing and guessing game."
+    />
+
+    <!-- ✅ PWA / ICONS -->
     <link rel="icon" href="%PUBLIC_URL%/logo.png" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
-    <!-- Google Analytics (GA4) -->
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-3CJN008N0X"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <!-- ✅ MOBILE FULLSCREEN HINTS -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
 
-  gtag('config', 'G-3CJN008N0X');
-</script>
-     
+    <!-- =========================
+         GOOGLE ANALYTICS (GA4)
+    ========================== -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-3CJN008N0X"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-3CJN008N0X");
+    </script>
 
-    <!-- Google AdSense -->
+    <!-- =========================
+         GOOGLE ADSENSE
+    ========================== -->
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8525673711213815"
       crossorigin="anonymous"
     ></script>
-
   </head>
 
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      You need to enable JavaScript to run Art Arena.
+    </noscript>
+
     <div id="root"></div>
   </body>
 </html>

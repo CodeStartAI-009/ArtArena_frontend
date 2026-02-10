@@ -11,6 +11,7 @@ import Faq from "./pages/Home/Faq";
 import Terms from "./pages/Home/Terms";
 import Privacy from "./pages/Home/Privacy";
 import AuthSuccess from "./pages/AuthSuccess";
+import RequireLandscape from "./RequireLandscape";
 
 import { useAuth } from "./context/AuthContext";
 import useAutoAuth from "./hooks/useAutoAuth";
@@ -54,7 +55,7 @@ export default function App() {
   }, []);
 
   /* ================= AUTO AUTH (guest / token) ================= */
-  useAutoAuth(); // ✅ runs AFTER referral is stored
+  useAutoAuth();
 
   /* ================= SPLASH ================= */
   if (!authReady) {
@@ -66,20 +67,23 @@ export default function App() {
       {/* ✅ Load AdSense ONCE globally */}
       <AdSenseLoader />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/lobby/:code" element={<Lobby />} />
-        <Route path="/game/:code" element={<Game />} />
-        <Route path="/store" element={<Store />} />
-        <Route path="/auth/success" element={<AuthSuccess />} />
-        <Route path="/features" element={<Features />} />
-        <Route path="/faq" element={<Faq />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/privacy" element={<Privacy />} />
+      {/* ✅ LANDSCAPE REQUIRED FOR ENTIRE APP */}
+      <RequireLandscape>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/lobby/:code" element={<Lobby />} />
+          <Route path="/game/:code" element={<Game />} />
+          <Route path="/store" element={<Store />} />
+          <Route path="/auth/success" element={<AuthSuccess />} />
+          <Route path="/features" element={<Features />} />
+          <Route path="/faq" element={<Faq />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
 
-        {/* fallback */}
-        <Route path="*" element={<Home />} />
-      </Routes>
+          {/* fallback */}
+          <Route path="*" element={<Home />} />
+        </Routes>
+      </RequireLandscape>
     </>
   );
 }
