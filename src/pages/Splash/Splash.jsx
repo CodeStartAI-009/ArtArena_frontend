@@ -22,7 +22,7 @@ export default function Splash() {
         <div className="splash-buttons">
           {/* GOOGLE PLAY */}
           <a
-            href="https://play.google.com/store/apps/details?id=com.yourcompany.artarena"
+            href=""
             target="_blank"
             rel="noreferrer"
           >

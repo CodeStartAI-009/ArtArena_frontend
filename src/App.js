@@ -30,6 +30,29 @@ export default function App() {
     }
   }, [location.search]);
 
+  /* ================= DISABLE RIGHT CLICK / INSPECT (DETERRENT) ================= */
+  useEffect(() => {
+    const disableRightClick = (e) => e.preventDefault();
+
+    const disableKeys = (e) => {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key)) ||
+        (e.ctrlKey && e.key === "u")
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("contextmenu", disableRightClick);
+    document.addEventListener("keydown", disableKeys);
+
+    return () => {
+      document.removeEventListener("contextmenu", disableRightClick);
+      document.removeEventListener("keydown", disableKeys);
+    };
+  }, []);
+
   /* ================= AUTO AUTH (guest / token) ================= */
   useAutoAuth(); // ✅ runs AFTER referral is stored
 
