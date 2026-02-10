@@ -15,9 +15,8 @@ import { createRoom } from "../../api/room.api";
 const MODES = ["Classic", "Quick", "Kids", "Together"];
 const GAMEPLAY_CLASSIC = ["Score", "Timer"];
 const GAMEPLAY_TOGETHER = ["Drawing", "Open-canvas"];
-/* ================= CONSTANTS ================= */
-const TIMERS = [20, 30, 40];
 
+const TIMERS = [20, 30, 40];
 const SCORES = [5, 10, 15, 30];
 const ROUNDS = [2, 5, 8, 10, 15];
 const MAX_PLAYERS = [2, 3, 4, 6, 8];
@@ -31,7 +30,12 @@ export default function CreateGameModal({ onClose }) {
   const [gameplay, setGameplay] = useState(0);
   const [timer, setTimer] = useState(1);
   const [score, setScore] = useState(1);
-  const [rounds, setRounds] = useState(1);
+
+  // ✅ DEFAULT TO 5 ROUNDS (index of 5 in ROUNDS)
+  const [rounds, setRounds] = useState(
+    ROUNDS.indexOf(5)
+  );
+
   const [players, setPlayers] = useState(2);
 
   const [theme, setTheme] = useState("random");
@@ -62,33 +66,31 @@ export default function CreateGameModal({ onClose }) {
 
     try {
       setLoading(true);
- /* ================= CREATE ================= */
-const payload = {
-  mode: selectedMode,
-  gameplay: selectedGameplay,
-  timer:
-    selectedGameplay === "Timer" || isQuick
-      ? TIMERS[timer] // ✅ number
-      : null,
-  score:
-    selectedGameplay === "Score" && !isQuick
-      ? SCORES[score]
-      : null,
-  totalRounds:
-    isKids || isTogether ? null : ROUNDS[rounds],
-  maxPlayers: isTogether ? 2 : MAX_PLAYERS[players],
-  theme,
-  isPrivate: true,
-};
+
+      const payload = {
+        mode: selectedMode,
+        gameplay: selectedGameplay,
+        timer:
+          selectedGameplay === "Timer" || isQuick
+            ? TIMERS[timer]
+            : null,
+        score:
+          selectedGameplay === "Score" && !isQuick
+            ? SCORES[score]
+            : null,
+
+        // ✅ KIDS MODE SENDS ROUNDS (DEFAULT 5, USER CHANGEABLE)
+        totalRounds: isTogether ? null : ROUNDS[rounds],
+
+        maxPlayers: isTogether ? 2 : MAX_PLAYERS[players],
+        theme,
+        isPrivate: true,
+      };
 
       const res = await createRoom(payload);
-
-      // ✅ CORRECT: extract code
       const code = res.data.room.code;
 
-      // ✅ ONLY navigate
       navigate(`/lobby/${code}`);
-
       onClose();
     } catch (err) {
       console.error("❌ Failed to create room", err);
@@ -130,7 +132,7 @@ const payload = {
             <div className="mode-info">
               {selectedMode === "Classic" && "Score or Timer based play"}
               {selectedMode === "Quick" && "Fast timer-based rounds"}
-              {selectedMode === "Kids" && "Simple mode, 2 players"}
+              {selectedMode === "Kids" && "Simple mode, beginner-friendly"}
               {selectedMode === "Together" &&
                 "Two-player collaborative drawing"}
             </div>
@@ -152,13 +154,12 @@ const payload = {
 
           {/* TIMER */}
           {(selectedGameplay === "Timer" || isQuick) && !isTogether && (
-             <Row
-             label="Round Timer"
-             value={`${TIMERS[timer]} sec`}
-             onLeft={() => setTimer(cycle(TIMERS, timer, -1))}
-             onRight={() => setTimer(cycle(TIMERS, timer, 1))}
-           />
-           
+            <Row
+              label="Round Timer"
+              value={`${TIMERS[timer]} sec`}
+              onLeft={() => setTimer(cycle(TIMERS, timer, -1))}
+              onRight={() => setTimer(cycle(TIMERS, timer, 1))}
+            />
           )}
 
           {/* SCORE */}
@@ -171,8 +172,8 @@ const payload = {
             />
           )}
 
-          {/* ROUNDS */}
-          {!isKids && !isTogether && (
+          {/* ✅ ROUNDS (NOW SHOWN FOR KIDS) */}
+          {!isTogether && (
             <Row
               label="Total Rounds"
               value={ROUNDS[rounds]}
