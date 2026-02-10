@@ -70,6 +70,12 @@
     height: 56px;  /* ⬆ much larger logo */
     opacity: 1;
   }
+  .store-link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
   
   /* ANIMATION */
   @keyframes float {

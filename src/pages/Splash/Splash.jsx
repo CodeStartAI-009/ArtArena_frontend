@@ -1,12 +1,17 @@
 // src/pages/Splash/Splash.jsx
 import "./Splash.css";
 
-// IMPORT ASSETS (THIS IS REQUIRED)
+// IMPORT ASSETS
 import titleLogo from "../../assets/logo/logo.png";
 import loaderIcon from "../../assets/icons/image-loader.png";
 import companyLogo from "../../assets/logo/company.jpeg";
 
 export default function Splash() {
+  const handlePlayStoreClick = () => {
+    // Optional: show toast or alert
+    // alert("Android app coming soon!");
+  };
+
   return (
     <div className="splash-root">
       {/* CENTER CONTENT */}
@@ -20,24 +25,26 @@ export default function Splash() {
 
         {/* BUTTONS */}
         <div className="splash-buttons">
-          {/* GOOGLE PLAY */}
-          <a
-            href=""
-            target="_blank"
-            rel="noreferrer"
+          {/* GOOGLE PLAY (COMING SOON) */}
+          <button
+            type="button"
+            onClick={handlePlayStoreClick}
+            className="store-link-btn"
+            aria-label="Google Play (Coming Soon)"
           >
             <img
               src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
-              alt="Get it on Google Play"
+              alt="Get it on Google Play (Coming Soon)"
               className="store-btn"
             />
-          </a>
+          </button>
 
-          {/* DISCORD */}
+          {/* DISCORD (REAL LINK) */}
           <a
             href="https://discord.gg/5rPSTx7n"
             target="_blank"
             rel="noreferrer"
+            aria-label="Join Discord"
           >
             <img
               src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png"
