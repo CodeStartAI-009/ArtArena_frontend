@@ -12,6 +12,7 @@ export default function Lobby() {
   const { authReady, user } = useAuth();
 
   const [room, setRoom] = useState(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   const joinedRef = useRef(false);
   const navigatedRef = useRef(false);
@@ -20,6 +21,7 @@ export default function Lobby() {
   const maxPlayers = room?.maxPlayers ?? "-";
 
   const isHost = room?.hostId === user?._id;
+
   const canStart =
     isHost &&
     players.length >= 2 &&
@@ -28,6 +30,14 @@ export default function Lobby() {
   const theme =
     themes.find(t => t.id === room?.theme) ||
     themes.find(t => t.id === "classic");
+
+  /* ================= DETECT TOUCH DEVICE ================= */
+  useEffect(() => {
+    const touch =
+      "ontouchstart" in window ||
+      navigator.maxTouchPoints > 0;
+    setIsTouchDevice(touch);
+  }, []);
 
   /* ================= SOCKET ================= */
   useEffect(() => {
@@ -54,11 +64,9 @@ export default function Lobby() {
     socket.on("LOBBY_UPDATE", handleLobbyUpdate);
     socket.on("GAME_STARTED", handleGameStarted);
 
-    /* ---------- SAFE JOIN (ONCE) ---------- */
     const joinLobby = () => {
       if (joinedRef.current) return;
       joinedRef.current = true;
-
       socket.emit("LOBBY_JOIN", { code });
     };
 
@@ -75,9 +83,9 @@ export default function Lobby() {
     };
   }, [authReady, user, socket, code, navigate]);
 
-  /* ================= SPACE BAR ================= */
+  /* ================= DESKTOP START (SPACE) ================= */
   useEffect(() => {
-    if (!canStart) return;
+    if (!canStart || isTouchDevice) return;
 
     const onKeyDown = (e) => {
       if (e.code !== "Space") return;
@@ -87,7 +95,13 @@ export default function Lobby() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [canStart, code, socket]);
+  }, [canStart, code, socket, isTouchDevice]);
+
+  /* ================= MOBILE START (TAP) ================= */
+  const handleTapStart = () => {
+    if (!canStart || !isTouchDevice) return;
+    socket.emit("START_GAME", { code });
+  };
 
   /* ================= LOADING ================= */
   if (!room) {
@@ -103,7 +117,12 @@ export default function Lobby() {
     <div
       className="lobby-root"
       tabIndex={0}
-      style={{ backgroundImage: `url(${theme.image})` }}
+      onClick={handleTapStart}
+      style={{
+        backgroundImage: `url(${theme.image})`,
+        cursor:
+          canStart && isTouchDevice ? "pointer" : "default",
+      }}
     >
       <div className="lobby-title">
         <span className="title-left">
@@ -134,7 +153,9 @@ export default function Lobby() {
 
       <div className="lobby-footer">
         {canStart
-          ? "Press SPACE to start the game"
+          ? isTouchDevice
+            ? "Tap anywhere to start"
+            : "Press SPACE to start the game"
           : "Waiting for players…"}
       </div>
     </div>
