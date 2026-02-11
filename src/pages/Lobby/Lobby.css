@@ -160,3 +160,131 @@
   font-size: 20px;
   font-weight: 900;
 }
+/* =========================================================
+   RESPONSIVE — PORTRAIT ONLY
+   Landscape behaves like desktop
+========================================================= */
+
+
+/* ================= TABLET PORTRAIT ================= */
+@media (max-width: 1024px) and (orientation: portrait) {
+
+  .lobby-title {
+    top: 14px;
+    padding: 12px 26px;
+    border-radius: 18px;
+  }
+
+  .title-left {
+    font-size: 18px;
+  }
+
+  .title-right {
+    font-size: 14px;
+  }
+
+  .players-panel {
+    top: 110px;
+    width: 340px;
+    padding: 18px 16px 20px;
+    border-radius: 22px;
+  }
+
+  .players-panel h3 {
+    font-size: 17px;
+  }
+
+  .player-row {
+    padding: 10px 14px;
+  }
+
+  .player-name {
+    font-size: 15px;
+  }
+
+  .lobby-footer {
+    font-size: 16px;
+    bottom: 22px;
+  }
+}
+
+
+/* ================= MOBILE PORTRAIT ================= */
+@media (max-width: 715px) and (orientation: portrait) {
+
+  .lobby-title {
+    top: 12px;
+    padding: 10px 20px;
+    border-radius: 16px;
+    gap: 14px;
+  }
+
+  .title-left {
+    font-size: 16px;
+  }
+
+  .title-right {
+    font-size: 13px;
+  }
+
+  .players-panel {
+    top: 100px;
+    width: 88%;
+    padding: 16px 14px 18px;
+    border-radius: 20px;
+  }
+
+  .players-panel h3 {
+    font-size: 16px;
+  }
+
+  .player-row {
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  .player-index {
+    width: 24px;
+    height: 24px;
+    font-size: 13px;
+  }
+
+  .player-name {
+    font-size: 14px;
+  }
+
+  .lobby-footer {
+    font-size: 15px;
+    bottom: 20px;
+  }
+}
+
+
+/* ================= SMALL PHONE PORTRAIT ================= */
+@media (max-width: 360px) and (orientation: portrait) {
+
+  .lobby-title {
+    padding: 8px 16px;
+  }
+
+  .title-left {
+    font-size: 15px;
+  }
+
+  .title-right {
+    font-size: 12px;
+  }
+
+  .players-panel {
+    top: 90px;
+    padding: 14px 12px;
+  }
+
+  .player-name {
+    font-size: 13px;
+  }
+
+  .lobby-footer {
+    font-size: 14px;
+  }
+}

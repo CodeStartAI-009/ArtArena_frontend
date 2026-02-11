@@ -372,20 +372,146 @@
 /* ===============================
    MOBILE
 ================================ */
+ /* =========================================================
+   GAME RESPONSIVE — PORTRAIT ONLY
+   Landscape behaves like desktop
+========================================================= */
 
-@media (max-width: 900px) {
-  .player-list { display: none; }
-  .canvas-wrapper { width: 92vw; height: 50vh; }
-  .guess-input { width: 92vw; }
-}
 
-@media (max-width: 600px) {
+/* ================= TABLET PORTRAIT ================= */
+@media (max-width: 1024px) and (orientation: portrait) {
+
   .top-bar {
-    width: 92vw;
+    min-width: 360px;
+    padding: 8px 18px;
     font-size: 14px;
   }
 
+  .player-list {
+    left: 12px;
+    top: 78px;
+    width: 170px;
+  }
+
+  .player-card {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .canvas-wrapper {
+    width: 680px;
+    height: 360px;
+  }
+
+  .guess-input {
+    width: 360px;
+    font-size: 16px;
+    padding: 12px 16px;
+  }
+
+  .word-letter {
+    font-size: 22px;
+    width: 22px;
+  }
+}
+
+
+/* ================= MOBILE PORTRAIT ================= */
+@media (max-width: 715px) and (orientation: portrait) {
+
   .game-screen {
     padding-top: 80px;
+  }
+
+  .top-bar {
+    min-width: 300px;
+    font-size: 13px;
+    gap: 14px;
+    padding: 6px 14px;
+  }
+
+  .player-list {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 90%;
+    margin-bottom: 12px;
+    align-self: center;
+  }
+
+  .player-card {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .canvas-wrapper {
+    width: 92%;
+    height: 260px;
+    margin-top: 14px;
+  }
+
+  .guess-input {
+    width: 90%;
+    font-size: 15px;
+    padding: 12px 14px;
+  }
+
+  .word-mask {
+    gap: 6px;
+  }
+
+  .word-letter {
+    font-size: 18px;
+    width: 18px;
+  }
+
+  .tool-bar {
+    gap: 6px;
+  }
+
+  .tool-bar button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .color-picker {
+    padding: 6px 10px;
+  }
+
+  .color-picker label {
+    font-size: 12px;
+  }
+
+  .color-picker input[type="color"] {
+    width: 30px;
+    height: 30px;
+  }
+
+  .start-guessing-btn {
+    font-size: 14px;
+    padding: 10px 18px;
+  }
+}
+
+
+/* ================= SMALL PHONES PORTRAIT ================= */
+@media (max-width: 360px) and (orientation: portrait) {
+
+  .top-bar {
+    font-size: 12px;
+    min-width: 260px;
+  }
+
+  .canvas-wrapper {
+    height: 220px;
+  }
+
+  .guess-input {
+    font-size: 14px;
+  }
+
+  .word-letter {
+    font-size: 16px;
+    width: 16px;
   }
 }
