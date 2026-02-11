@@ -5,27 +5,27 @@
 
     <title>Art Arena</title>
 
-    <!-- ✅ GAME-FRIENDLY VIEWPORT -->
+    <!-- GAME-FRIENDLY VIEWPORT -->
     <meta
       name="viewport"
       content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
 
-    <!-- ✅ THEME / STATUS BAR -->
+    <!-- THEME -->
     <meta name="theme-color" content="#000000" />
 
-    <!-- ✅ SEO -->
+    <!-- SEO -->
     <meta
       name="description"
       content="Art Arena — a multiplayer drawing and guessing game."
     />
 
-    <!-- ✅ PWA / ICONS -->
+    <!-- PWA -->
     <link rel="icon" href="%PUBLIC_URL%/logo.png" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
-    <!-- ✅ MOBILE FULLSCREEN HINTS -->
+    <!-- MOBILE FULLSCREEN -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -33,15 +33,10 @@
     <!-- =========================
          GOOGLE ANALYTICS (GA4)
     ========================== -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-3CJN008N0X"
-    ></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3CJN008N0X"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
+      function gtag(){dataLayer.push(arguments);}
       gtag("js", new Date());
       gtag("config", "G-3CJN008N0X");
     </script>
@@ -52,8 +47,24 @@
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8525673711213815"
-      crossorigin="anonymous"
-    ></script>
+      crossorigin="anonymous">
+    </script>
+
+    <!-- =========================
+         MONETAG VIGNETTE
+    ========================== -->
+    <script>
+      (function(s){
+        s.dataset.zone='10599539';
+        s.src='https://gizokraijaw.net/vignette.min.js';
+      })(
+        [document.documentElement, document.body]
+          .filter(Boolean)
+          .pop()
+          .appendChild(document.createElement('script'))
+      );
+    </script>
+
   </head>
 
   <body>
