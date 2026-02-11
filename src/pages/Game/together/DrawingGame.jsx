@@ -1,5 +1,3 @@
-// src/pages/Game/together/DrawingGame.jsx
-
 import { useRef, useEffect, useState } from "react";
 import { getSocket } from "../../../socket/socket";
 import useGameStore from "../store/store";
@@ -12,15 +10,13 @@ export default function DrawingGame({ boardImage }) {
   const isDrawingRef = useRef(false);
 
   const [color, setColor] = useState("#000000");
-  const [tool, setTool] = useState("draw"); // draw | erase
+  const [tool, setTool] = useState("draw");
 
   const socket = getSocket();
   const { game } = useGameStore();
   const roomCode = game?.code;
 
-  /* =========================
-     SAFE FLAGS
-  ========================== */
+  /* ================= SAFE FLAGS ================= */
   const isReady =
     !!game &&
     !!game.selfId &&
@@ -30,9 +26,7 @@ export default function DrawingGame({ boardImage }) {
   const isLeftPlayer =
     isReady && game.players[0]?.id === game.selfId;
 
-  /* =========================
-     CANVAS SETUP (RETINA SAFE)
-  ========================== */
+  /* ================= CANVAS SETUP ================= */
   const setupCanvas = () => {
     const canvas = canvasRef.current;
     const wrapper = canvas?.parentElement;
@@ -51,17 +45,12 @@ export default function DrawingGame({ boardImage }) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     ctx.lineCap = "round";
-    ctx.lineJoin = "round"; // ✅ CRITICAL FIX
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "#000";
-    ctx.globalCompositeOperation = "source-over";
+    ctx.lineJoin = "round";
 
     ctxRef.current = ctx;
   };
 
-  /* =========================
-     SOCKET + INIT (WITH SYNC)
-  ========================== */
+  /* ================= SOCKET + SYNC ================= */
   useEffect(() => {
     if (!roomCode) return;
 
@@ -70,13 +59,22 @@ export default function DrawingGame({ boardImage }) {
 
     const drawStroke = ({ x, y, prevX, prevY, color, tool }) => {
       const ctx = ctxRef.current;
-      if (!ctx || prevX == null || prevY == null) return;
+      const canvas = canvasRef.current;
+      if (!ctx || !canvas) return;
+
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      const scaledX = x * width;
+      const scaledY = y * height;
+      const scaledPrevX = prevX * width;
+      const scaledPrevY = prevY * height;
 
       ctx.save();
 
       if (tool === "erase") {
         ctx.globalCompositeOperation = "destination-out";
-        ctx.lineWidth = 24; // ✅ FIXED
+        ctx.lineWidth = 24;
       } else {
         ctx.globalCompositeOperation = "source-over";
         ctx.strokeStyle = color || "#000";
@@ -84,8 +82,8 @@ export default function DrawingGame({ boardImage }) {
       }
 
       ctx.beginPath();
-      ctx.moveTo(prevX, prevY);
-      ctx.lineTo(x, y);
+      ctx.moveTo(scaledPrevX, scaledPrevY);
+      ctx.lineTo(scaledX, scaledY);
       ctx.stroke();
 
       ctx.restore();
@@ -117,9 +115,7 @@ export default function DrawingGame({ boardImage }) {
     };
   }, [roomCode, socket]);
 
-  /* =========================
-     HELPERS
-  ========================== */
+  /* ================= NORMALIZED POINT ================= */
   const getPoint = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
@@ -127,26 +123,25 @@ export default function DrawingGame({ boardImage }) {
     const rect = canvas.getBoundingClientRect();
     const t = e.touches?.[0];
 
+    const rawX = (t ? t.clientX : e.clientX) - rect.left;
+    const rawY = (t ? t.clientY : e.clientY) - rect.top;
+
     return {
-      x: (t ? t.clientX : e.clientX) - rect.left,
-      y: (t ? t.clientY : e.clientY) - rect.top,
+      x: rawX / rect.width,
+      y: rawY / rect.height,
     };
   };
 
-  const canDrawHere = (x) => {
-    if (!isReady || !canvasRef.current) return false;
+  /* ================= SIDE LIMIT ================= */
+  const canDrawHere = (normalizedX) => {
+    if (!isReady) return false;
 
-    const mid =
-      canvasRef.current.width /
-      (window.devicePixelRatio || 1) /
-      2;
-
-    return isLeftPlayer ? x <= mid : x >= mid;
+    return isLeftPlayer
+      ? normalizedX <= 0.5
+      : normalizedX >= 0.5;
   };
 
-  /* =========================
-     DRAW EVENTS
-  ========================== */
+  /* ================= DRAW EVENTS ================= */
   const startDrawing = (e) => {
     if (!isReady) return;
     e.preventDefault();
@@ -159,15 +154,24 @@ export default function DrawingGame({ boardImage }) {
   };
 
   const draw = (e) => {
-    if (!isDrawingRef.current || !isReady) return;
+    if (!isReady || !isDrawingRef.current) return;
     e.preventDefault();
 
     const point = getPoint(e);
-    if (!point || !canDrawHere(point.x)) return;
-
     const prev = lastPointRef.current;
+    if (!point || !prev) return;
+    if (!canDrawHere(point.x)) return;
+
     const ctx = ctxRef.current;
-    if (!prev || !ctx) return;
+    const canvas = canvasRef.current;
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    const scaledX = point.x * width;
+    const scaledY = point.y * height;
+    const scaledPrevX = prev.x * width;
+    const scaledPrevY = prev.y * height;
 
     ctx.save();
 
@@ -181,8 +185,8 @@ export default function DrawingGame({ boardImage }) {
     }
 
     ctx.beginPath();
-    ctx.moveTo(prev.x, prev.y);
-    ctx.lineTo(point.x, point.y);
+    ctx.moveTo(scaledPrevX, scaledPrevY);
+    ctx.lineTo(scaledX, scaledY);
     ctx.stroke();
 
     ctx.restore();
@@ -205,16 +209,12 @@ export default function DrawingGame({ boardImage }) {
     lastPointRef.current = null;
   };
 
-  /* =========================
-     LOADING UI
-  ========================== */
+  /* ================= LOADING ================= */
   if (!isReady) {
     return <div className="game-loading">Waiting for players…</div>;
   }
 
-  /* =========================
-     RENDER
-  ========================== */
+  /* ================= RENDER ================= */
   return (
     <>
       <div className="together-instructions">
@@ -222,15 +222,14 @@ export default function DrawingGame({ boardImage }) {
         <ul>
           <li>
             {isLeftPlayer
-              ? "You can draw only on the LEFT side of the canvas."
-              : "You can draw only on the RIGHT side of the canvas."}
+              ? "You can draw only on the LEFT side."
+              : "You can draw only on the RIGHT side."}
           </li>
           <li>Work together to complete the drawing.</li>
           <li>Your drawing is synced live.</li>
         </ul>
       </div>
 
-      {/* TOOLBAR */}
       <div className="tool-bar">
         <button
           className={tool === "draw" ? "active" : ""}
@@ -246,7 +245,6 @@ export default function DrawingGame({ boardImage }) {
         </button>
       </div>
 
-      {/* COLOR PICKER */}
       {tool === "draw" && (
         <div className="color-picker">
           <label>
@@ -260,11 +258,12 @@ export default function DrawingGame({ boardImage }) {
         </div>
       )}
 
-      {/* CANVAS */}
       <div
         className="canvas-wrapper"
         style={{
-          backgroundImage: boardImage ? `url(${boardImage})` : "none",
+          backgroundImage: boardImage
+            ? `url(${boardImage})`
+            : "none",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",

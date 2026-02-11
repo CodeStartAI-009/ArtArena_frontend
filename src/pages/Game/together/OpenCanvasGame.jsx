@@ -1,5 +1,3 @@
-// src/pages/Game/together/OpenCanvasGame.jsx
-
 import { useRef, useEffect, useState } from "react";
 import { getSocket } from "../../../socket/socket";
 import useGameStore from "../store/store";
@@ -12,15 +10,13 @@ export default function OpenCanvasGame({ boardImage }) {
   const isDrawingRef = useRef(false);
 
   const [color, setColor] = useState("#000000");
-  const [tool, setTool] = useState("draw"); // draw | erase
+  const [tool, setTool] = useState("draw");
 
   const socket = getSocket();
   const { game } = useGameStore();
   const roomCode = game?.code;
 
-  /* =========================
-     CANVAS SETUP (RETINA SAFE)
-  ========================== */
+  /* ================= CANVAS SETUP ================= */
   const setupCanvas = () => {
     const canvas = canvasRef.current;
     const wrapper = canvas?.parentElement;
@@ -40,16 +36,11 @@ export default function OpenCanvasGame({ boardImage }) {
 
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "#000";
-    ctx.globalCompositeOperation = "source-over";
 
     ctxRef.current = ctx;
   };
 
-  /* =========================
-     SOCKET + INIT
-  ========================== */
+  /* ================= SOCKET ================= */
   useEffect(() => {
     if (!roomCode) return;
 
@@ -58,7 +49,16 @@ export default function OpenCanvasGame({ boardImage }) {
 
     const drawStroke = ({ x, y, prevX, prevY, color, tool }) => {
       const ctx = ctxRef.current;
-      if (!ctx || prevX == null || prevY == null) return;
+      const canvas = canvasRef.current;
+      if (!ctx || !canvas) return;
+
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      const scaledX = x * width;
+      const scaledY = y * height;
+      const scaledPrevX = prevX * width;
+      const scaledPrevY = prevY * height;
 
       ctx.save();
 
@@ -72,8 +72,8 @@ export default function OpenCanvasGame({ boardImage }) {
       }
 
       ctx.beginPath();
-      ctx.moveTo(prevX, prevY);
-      ctx.lineTo(x, y);
+      ctx.moveTo(scaledPrevX, scaledPrevY);
+      ctx.lineTo(scaledX, scaledY);
       ctx.stroke();
 
       ctx.restore();
@@ -96,9 +96,7 @@ export default function OpenCanvasGame({ boardImage }) {
     };
   }, [socket, roomCode]);
 
-  /* =========================
-     HELPERS
-  ========================== */
+  /* ================= NORMALIZED POINT ================= */
   const getPoint = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
@@ -106,15 +104,16 @@ export default function OpenCanvasGame({ boardImage }) {
     const rect = canvas.getBoundingClientRect();
     const t = e.touches?.[0];
 
+    const rawX = (t ? t.clientX : e.clientX) - rect.left;
+    const rawY = (t ? t.clientY : e.clientY) - rect.top;
+
     return {
-      x: (t ? t.clientX : e.clientX) - rect.left,
-      y: (t ? t.clientY : e.clientY) - rect.top,
+      x: rawX / rect.width,
+      y: rawY / rect.height,
     };
   };
 
-  /* =========================
-     DRAW EVENTS (EVERYONE)
-  ========================== */
+  /* ================= DRAW EVENTS ================= */
   const startDrawing = (e) => {
     if (!game) return;
     e.preventDefault();
@@ -133,8 +132,17 @@ export default function OpenCanvasGame({ boardImage }) {
     const point = getPoint(e);
     const prev = lastPointRef.current;
     const ctx = ctxRef.current;
+    const canvas = canvasRef.current;
 
-    if (!point || !prev || !ctx) return;
+    if (!point || !prev || !ctx || !canvas) return;
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    const scaledX = point.x * width;
+    const scaledY = point.y * height;
+    const scaledPrevX = prev.x * width;
+    const scaledPrevY = prev.y * height;
 
     ctx.save();
 
@@ -148,8 +156,8 @@ export default function OpenCanvasGame({ boardImage }) {
     }
 
     ctx.beginPath();
-    ctx.moveTo(prev.x, prev.y);
-    ctx.lineTo(point.x, point.y);
+    ctx.moveTo(scaledPrevX, scaledPrevY);
+    ctx.lineTo(scaledX, scaledY);
     ctx.stroke();
 
     ctx.restore();
@@ -172,19 +180,14 @@ export default function OpenCanvasGame({ boardImage }) {
     lastPointRef.current = null;
   };
 
-  /* =========================
-     LOADING UI
-  ========================== */
+  /* ================= LOADING ================= */
   if (!game) {
     return <div className="game-loading">Waiting for players…</div>;
   }
 
-  /* =========================
-     RENDER
-  ========================== */
+  /* ================= RENDER ================= */
   return (
     <>
-      {/* TOOLBAR */}
       <div className="tool-bar">
         <button
           className={tool === "draw" ? "active" : ""}
@@ -200,7 +203,6 @@ export default function OpenCanvasGame({ boardImage }) {
         </button>
       </div>
 
-      {/* COLOR PICKER */}
       {tool === "draw" && (
         <div className="color-picker">
           <label>
@@ -214,7 +216,6 @@ export default function OpenCanvasGame({ boardImage }) {
         </div>
       )}
 
-      {/* CANVAS */}
       <div
         className="canvas-wrapper"
         style={{
