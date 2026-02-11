@@ -97,10 +97,22 @@ export default function Game() {
     };
 
     const onGameEnded = () => {
+      console.log("Game ended → showing ad");
+    
+      // Show interstitial ad
+      if (typeof window.sdk !== "undefined" && window.sdk.showAd) {
+        window.sdk.showAd();
+      }
+    
       exitingRef.current = true;
-      reset();
-      navigate("/", { replace: true });
+    
+      // Delay navigation slightly so ad can trigger
+      setTimeout(() => {
+        reset();
+        navigate("/", { replace: true });
+      }, 1000);
     };
+    
 
     const onForceExit = () => {
       exitingRef.current = true;
