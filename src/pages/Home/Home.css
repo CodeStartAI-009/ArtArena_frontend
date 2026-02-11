@@ -624,47 +624,13 @@
 }
 
 /* ================= MOBILE ================= */
+/* =========================================================
+   RESPONSIVE — PORTRAIT ONLY
+   Landscape behaves like desktop
+========================================================= */
 
-@media (max-width: 715px) {
-  .referral-floating {
-    right: 10px;
-    top: 64px;
-    width: 260px;
-  }
-
-  .referral-title {
-    font-size: 14px;
-  }
-
-  .referral-link input {
-    font-size: 12px;
-    padding: 8px 10px;
-  }
-
-  .referral-link button {
-    font-size: 12px;
-    padding: 8px 12px;
-  }
-
-  .referral-note {
-    font-size: 12px;
-  }
-}
-
-/* MOBILE */
-@media (max-width: 715px) {
-  .policy-content {
-    bottom: 18px;
-  }
-
-  .policy-links button {
-    font-size: 12px;
-  }
-}
-
-
-/* ================= TABLET ================= */
-@media (max-width: 1024px) {
+/* ================= TABLET PORTRAIT ================= */
+@media (max-width: 1024px) and (orientation: portrait) {
 
   .level-section {
     top: 14px;
@@ -710,15 +676,15 @@
     right: 14px;
   }
 }
-/* ================= MOBILE ================= */
-@media (max-width: 715px) {
 
-  /* GENERAL */
+
+/* ================= MOBILE PORTRAIT ================= */
+@media (max-width: 715px) and (orientation: portrait) {
+
   .home-root {
     font-size: 14px;
   }
 
-  /* TOP LEFT (LEVEL) */
   .level-section {
     top: 10px;
     left: 10px;
@@ -735,7 +701,6 @@
     font-size: 10px;
   }
 
-  /* TOP RIGHT BUTTONS */
   .top-right-actions {
     top: 10px;
     right: 10px;
@@ -755,17 +720,12 @@
     padding: 3px 6px;
   }
 
-  /* LEFT PANEL → BECOMES TOP STACK */
-   /* LEFT PANEL — MOBILE ALIGNMENT (MATCH LEVEL SECTION) */
-.left-panel {
-  top: 80px;          /* aligned under level-section */
-  left: 0%;         /* SAME inset as level-section */
-  transform: none;    /* IMPORTANT: remove centering */
-  padding: 8px 12px;
-  gap: 20px;
-}
+  .left-panel {
+    top: 80px;
+    left: 10px;
+    gap: 20px;
+  }
 
-  
   .economy-box,
   .user-box {
     padding: 12px;
@@ -777,7 +737,6 @@
     font-size: 14px;
   }
 
-  /* CENTER AVATAR */
   .center-area {
     top: 200px;
   }
@@ -787,7 +746,6 @@
     height: 120px;
   }
 
-  /* BOTTOM ACTIONS */
   .bottom-actions {
     bottom: 100px;
     gap: 14px;
@@ -808,7 +766,6 @@
     font-size: 14px;
   }
 
-  /* FOOTER */
   .footer-icons {
     right: 10px;
     bottom: 6px;
@@ -824,8 +781,10 @@
     height: 42px;
   }
 }
-/* ================= SMALL PHONES ================= */
-@media (max-width: 360px) {
+
+
+/* ================= SMALL PHONE PORTRAIT ================= */
+@media (max-width: 360px) and (orientation: portrait) {
 
   .play-main-btn {
     padding: 16px 40px;
