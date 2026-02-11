@@ -8,12 +8,14 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
   const lastPointRef = useRef(null);
   const isDrawingRef = useRef(false);
 
-  const [tool, setTool] = useState("draw"); // "draw" | "erase"
+  const [tool, setTool] = useState("draw");
 
   const socket = getSocket();
   const { isDrawer } = useGameStore();
 
-  /* ================= CANVAS SETUP (RETINA SAFE) ================= */
+  /* =========================
+     CANVAS SETUP (RETINA SAFE)
+  ========================== */
   const setupCanvas = () => {
     const canvas = canvasRef.current;
     const wrapper = canvas?.parentElement;
@@ -32,20 +34,30 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     ctx.lineCap = "round";
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = "#000";
+    ctx.lineJoin = "round";
 
     ctxRef.current = ctx;
   };
 
-  /* ================= SOCKET + INIT ================= */
+  /* =========================
+     SOCKET + INIT
+  ========================== */
   useEffect(() => {
     setupCanvas();
     window.addEventListener("resize", setupCanvas);
 
     const drawStroke = ({ x, y, prevX, prevY, tool }) => {
       const ctx = ctxRef.current;
-      if (!ctx || prevX == null || prevY == null) return;
+      const canvas = canvasRef.current;
+      if (!ctx || !canvas) return;
+
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      const scaledX = x * width;
+      const scaledY = y * height;
+      const scaledPrevX = prevX * width;
+      const scaledPrevY = prevY * height;
 
       ctx.save();
 
@@ -59,8 +71,8 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
       }
 
       ctx.beginPath();
-      ctx.moveTo(prevX, prevY);
-      ctx.lineTo(x, y);
+      ctx.moveTo(scaledPrevX, scaledPrevY);
+      ctx.lineTo(scaledX, scaledY);
       ctx.stroke();
 
       ctx.restore();
@@ -93,18 +105,28 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
     };
   }, [socket, roomCode]);
 
-  /* ================= HELPERS ================= */
+  /* =========================
+     GET NORMALIZED POINT
+  ========================== */
   const getPoint = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+
+    const rect = canvas.getBoundingClientRect();
     const t = e.touches?.[0];
 
+    const rawX = (t ? t.clientX : e.clientX) - rect.left;
+    const rawY = (t ? t.clientY : e.clientY) - rect.top;
+
     return {
-      x: (t ? t.clientX : e.clientX) - rect.left,
-      y: (t ? t.clientY : e.clientY) - rect.top,
+      x: rawX / rect.width,
+      y: rawY / rect.height,
     };
   };
 
-  /* ================= DRAW EVENTS ================= */
+  /* =========================
+     DRAW EVENTS
+  ========================== */
   const startDrawing = (e) => {
     if (!isDrawer) return;
     e.preventDefault();
@@ -119,9 +141,19 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
 
     const point = getPoint(e);
     const prev = lastPointRef.current;
-    if (!prev) return;
+    if (!point || !prev) return;
 
     const ctx = ctxRef.current;
+    const canvas = canvasRef.current;
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    const scaledX = point.x * width;
+    const scaledY = point.y * height;
+    const scaledPrevX = prev.x * width;
+    const scaledPrevY = prev.y * height;
+
     ctx.save();
 
     if (tool === "erase") {
@@ -134,9 +166,10 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
     }
 
     ctx.beginPath();
-    ctx.moveTo(prev.x, prev.y);
-    ctx.lineTo(point.x, point.y);
+    ctx.moveTo(scaledPrevX, scaledPrevY);
+    ctx.lineTo(scaledX, scaledY);
     ctx.stroke();
+
     ctx.restore();
 
     socket.emit("DRAW", {
@@ -145,7 +178,7 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
       y: point.y,
       prevX: prev.x,
       prevY: prev.y,
-      tool, // 🔑 send tool type
+      tool,
     });
 
     lastPointRef.current = point;
@@ -156,10 +189,11 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
     lastPointRef.current = null;
   };
 
-  /* ================= RENDER ================= */
+  /* =========================
+     RENDER
+  ========================== */
   return (
     <>
-      {/* TOOLBAR */}
       {isDrawer && (
         <div className="tool-bar">
           <button

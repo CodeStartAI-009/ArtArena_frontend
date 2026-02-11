@@ -630,12 +630,19 @@
 ========================================================= */
 
 /* ================= TABLET PORTRAIT ================= */
-@media (max-width: 1024px) and (orientation: portrait) {
+/* =========================================================
+   LANDSCAPE — SMALL HEIGHT DEVICES
+   (Phones in landscape mostly 320–420px height)
+========================================================= */
+
+
+/* ================= TABLET LANDSCAPE (SHORT HEIGHT) ================= */
+@media (max-height: 820px) and (orientation: landscape) {
 
   .level-section {
-    top: 14px;
+    top: 12px;
     left: 14px;
-    padding: 10px 14px;
+    padding: 8px 12px;
   }
 
   .xp-bar {
@@ -643,13 +650,13 @@
   }
 
   .left-panel {
-    top: 110px;
+    top: 100px;
     left: 14px;
-    gap: 40px;
+    gap: 30px;
   }
 
   .center-area {
-    top: 110px;
+    top: 100px;
   }
 
   .avatar-preview {
@@ -658,146 +665,123 @@
   }
 
   .bottom-actions {
-    bottom: 90px;
-  }
-
-  .play-main-btn {
-    padding: 22px 60px;
-    font-size: 26px;
-  }
-
-  .sub-actions button {
-    padding: 12px 26px;
-    font-size: 15px;
-  }
-
-  .top-right-actions {
-    top: 14px;
-    right: 14px;
-  }
-}
-
-
-/* ================= MOBILE PORTRAIT ================= */
-@media (max-width: 715px) and (orientation: portrait) {
-
-  .home-root {
-    font-size: 14px;
-  }
-
-  .level-section {
-    top: 10px;
-    left: 10px;
-    padding: 8px 12px;
-    border-radius: 14px;
-  }
-
-  .xp-bar {
-    width: 110px;
-    height: 10px;
-  }
-
-  .xp-text {
-    font-size: 10px;
-  }
-
-  .top-right-actions {
-    top: 10px;
-    right: 10px;
-    gap: 10px;
-  }
-
-  .top-action-btn {
-    padding: 10px 14px;
-    font-size: 14px;
-    border-radius: 16px;
-  }
-
-  .top-action-btn .badge {
-    top: -6px;
-    right: -6px;
-    font-size: 10px;
-    padding: 3px 6px;
-  }
-
-  .left-panel {
-    top: 80px;
-    left: 10px;
-    gap: 20px;
-  }
-
-  .economy-box,
-  .user-box {
-    padding: 12px;
-    border-radius: 16px;
-  }
-
-  .currency {
-    padding: 8px 10px;
-    font-size: 14px;
-  }
-
-  .center-area {
-    top: 200px;
-  }
-
-  .avatar-preview {
-    width: 120px;
-    height: 120px;
-  }
-
-  .bottom-actions {
-    bottom: 100px;
+    bottom: 70px;
     gap: 14px;
   }
 
   .play-main-btn {
-    padding: 18px 48px;
-    font-size: 22px;
-    border-radius: 26px;
-  }
-
-  .sub-actions {
-    gap: 12px;
+    padding: 20px 54px;
+    font-size: 24px;
   }
 
   .sub-actions button {
-    padding: 10px 20px;
+    padding: 10px 24px;
     font-size: 14px;
-  }
-
-  .footer-icons {
-    right: 10px;
-    bottom: 6px;
-    gap: 10px;
-  }
-
-  .footer-icons button {
-    padding: 10px;
-  }
-
-  .footer-icons img {
-    width: 42px;
-    height: 42px;
   }
 }
 
 
-/* ================= SMALL PHONE PORTRAIT ================= */
-@media (max-width: 360px) and (orientation: portrait) {
+/* ================= PHONE LANDSCAPE ================= */
+@media (max-height: 500px) and (orientation: landscape) {
+
+  .level-section {
+    top: 8px;
+    left: 10px;
+    padding: 4px 8px;
+  }
+
+  .xp-bar {
+    width: 100px;
+    height: 8px;
+  }
+
+  .xp-text {
+    font-size: 8px;
+  }
+
+  .top-right-actions {
+    top: 8px;
+    right: 10px;
+    gap: 8px;
+  }
+
+  .top-action-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .left-panel {
+    top: 70px;
+    gap: 18px;
+  }
+
+  .economy-box{
+    padding: 8px;
+    font-size: 12px;
+  }
+  .user-box {
+    padding: 8px;
+  }
+
+  .currency {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+
+  .center-area {
+    top: 90px;
+  }
+
+  .avatar-preview {
+    width: 110px;
+    height: 110px;
+  }
+
+  .bottom-actions {
+    bottom: 50px;
+    gap: 10px;
+  }
 
   .play-main-btn {
     padding: 16px 40px;
     font-size: 20px;
   }
 
-  .avatar-preview {
-    width: 100px;
-    height: 100px;
+  .sub-actions button {
+    padding: 8px 18px;
+    font-size: 13px;
   }
 
-  .top-action-btn {
-    font-size: 13px;
-    padding: 8px 12px;
+  .footer-icons {
+    bottom: 4px;
+    right: 10px;
+  }
+
+  .footer-icons img {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+
+/* ================= VERY SMALL LANDSCAPE (iPhone SE class) ================= */
+@media (max-height: 380px) and (orientation: landscape) {
+
+  .avatar-preview {
+    width: 90px;
+    height: 90px;
+  }
+
+  .play-main-btn {
+    font-size: 18px;
+    padding: 14px 36px;
+  }
+
+  .bottom-actions {
+    bottom: 40px;
+  }
+
+  .left-panel {
+    top: 60px;
   }
 }

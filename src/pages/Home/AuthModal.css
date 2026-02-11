@@ -113,4 +113,69 @@
       opacity: 1;
     }
   }
-  
+  /* =========================================
+   TABLET LANDSCAPE
+========================================= */
+@media (max-height: 900px) and (orientation: landscape) {
+
+  .auth-modal {
+    width: 340px;
+    padding: 22px 18px;
+  }
+
+  .auth-modal h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .auth-modal button {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+/* =========================================
+   PHONE LANDSCAPE
+========================================= */
+@media (max-height: 500px) and (orientation: landscape) {
+
+  .auth-modal {
+    width: 88%;
+    max-width: 420px;
+
+    padding: 18px 16px;
+    border-radius: 18px;
+
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .auth-modal h2 {
+    font-size: 16px;
+    margin-bottom: 14px;
+  }
+
+  .auth-modal button {
+    padding: 10px;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+}
+/* =========================================
+   VERY SMALL LANDSCAPE
+========================================= */
+@media (max-height: 380px) and (orientation: landscape) {
+
+  .auth-modal {
+    padding: 14px 14px;
+  }
+
+  .auth-modal h2 {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+
+  .auth-modal button {
+    padding: 8px;
+    font-size: 12px;
+  }
+}

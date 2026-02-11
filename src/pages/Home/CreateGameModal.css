@@ -164,3 +164,182 @@
 .row-control.clickable {
   cursor: pointer;
 }
+/* =========================================
+   TABLET PORTRAIT
+========================================= */
+@media (max-width: 1024px) and (orientation: portrait) {
+
+  .create-modal {
+    width: 380px;
+    padding: 22px 20px 26px;
+  }
+
+  .create-modal h2 {
+    font-size: 22px;
+  }
+
+  .row-control {
+    min-width: 160px;
+  }
+
+  .play-btn {
+    width: 60%;
+    font-size: 18px;
+    padding: 14px;
+  }
+
+  .theme-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+/* =========================================
+   MOBILE PORTRAIT
+========================================= */
+@media (max-width: 600px) and (orientation: portrait) {
+
+  .create-modal {
+    width: 92%;
+    max-width: 340px;
+    padding: 20px 16px 24px;
+  }
+
+  .create-modal h2 {
+    font-size: 20px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+  }
+
+  .row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .row-control {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .play-btn {
+    width: 80%;
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .theme-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .theme-card img {
+    height: 70px;
+  }
+}
+/* =========================================
+   TABLET LANDSCAPE
+========================================= */
+@media (max-height: 900px) and (orientation: landscape) {
+
+  .create-modal {
+    width: 420px;
+    padding: 20px 20px 24px;
+  }
+
+  .create-modal h2 {
+    font-size: 22px;
+  }
+
+  .row {
+    margin-bottom: 12px;
+  }
+
+  .play-btn {
+    font-size: 18px;
+    padding: 14px;
+  }
+
+  .theme-card img {
+    height: 70px;
+  }
+}
+/* =========================================
+   PHONE LANDSCAPE
+========================================= */
+@media (max-height: 500px) and (orientation: landscape) {
+
+  .create-modal {
+    width: 88%;
+    max-width: 480px;
+    padding: 16px 18px 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .create-modal h2 {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    margin-bottom: 12px;
+  }
+
+  .row {
+    margin-bottom: 10px;
+  }
+
+  .row-label {
+    font-size: 13px;
+  }
+
+  .row-control {
+    min-width: 140px;
+    padding: 4px 8px;
+  }
+
+  .play-btn {
+    width: 60%;
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .theme-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .theme-card img {
+    height: 60px;
+  }
+}
+/* =========================================
+   VERY SMALL LANDSCAPE
+========================================= */
+@media (max-height: 380px) and (orientation: landscape) {
+
+  .create-modal {
+    padding: 14px 14px 18px;
+  }
+
+  .create-modal h2 {
+    font-size: 16px;
+  }
+
+  .row-label {
+    font-size: 12px;
+  }
+
+  .row-control {
+    font-size: 13px;
+  }
+
+  .play-btn {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .theme-card img {
+    height: 50px;
+  }
+}

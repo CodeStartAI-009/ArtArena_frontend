@@ -107,4 +107,95 @@
       0 6px 0 #c96c00,
       0 12px 18px rgba(0,0,0,0.4);
   }
-  
+  /* =========================================
+   TABLET LANDSCAPE
+========================================= */
+@media (max-height: 900px) and (orientation: landscape) {
+
+  .join-modal {
+    width: 360px;
+    padding: 22px 20px 26px;
+  }
+
+  .join-modal h2 {
+    font-size: 22px;
+  }
+
+  .join-modal .subtitle {
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+
+  .room-input {
+    font-size: 15px;
+    padding: 12px 14px;
+  }
+
+  .join-btn {
+    font-size: 18px;
+    padding: 14px;
+  }
+}
+/* =========================================
+   PHONE LANDSCAPE
+========================================= */
+@media (max-height: 500px) and (orientation: landscape) {
+
+  .join-modal {
+    width: 88%;
+    max-width: 420px;
+    padding: 18px 18px 22px;
+
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .join-modal h2 {
+    font-size: 18px;
+  }
+
+  .join-modal .subtitle {
+    font-size: 11px;
+    margin-bottom: 14px;
+  }
+
+  .room-input {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+  }
+
+  .join-btn {
+    width: 60%;
+    font-size: 15px;
+    padding: 10px;
+  }
+}
+/* =========================================
+   VERY SMALL LANDSCAPE
+========================================= */
+@media (max-height: 380px) and (orientation: landscape) {
+
+  .join-modal {
+    padding: 14px 14px 18px;
+  }
+
+  .join-modal h2 {
+    font-size: 16px;
+  }
+
+  .join-modal .subtitle {
+    font-size: 10px;
+  }
+
+  .room-input {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  .join-btn {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
