@@ -10,7 +10,6 @@ import { getSocket } from "../../socket/socket";
 /* ASSETS */
 import companyLogo from "../../assets/logo/company.jpeg";
 import coinIcon from "../../assets/icons/coins.png";
-import gemIcon from "../../assets/icons/gem.png";
 import avatarLogo from "../../assets/logo/logo.png";
 
 /* ICONS */
@@ -123,12 +122,6 @@ export default function Home() {
         className="top-right-actions"
         onClick={e => e.stopPropagation()}
       >
-        <button
-          className="top-action-btn shop"
-          onClick={() => navigate("/store")}
-        >
-          🏪 Shop
-        </button>
 
         <button
           className="top-action-btn free"
@@ -182,14 +175,10 @@ export default function Home() {
 
       {/* ================= LEFT PANEL ================= */}
       <div className="left-panel">
-        <div className="economy-box clickable" onClick={() => navigate("/store")}>
+        <div className="economy-box clickable">
           <div className="currency">
             <img src={coinIcon} alt="Coins" />
             <span>{user.coins}</span>
-          </div>
-          <div className="currency">
-            <img src={gemIcon} alt="Gems" />
-            <span>{user.gems ?? 0}</span>
           </div>
         </div>
 
