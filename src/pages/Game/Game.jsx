@@ -15,7 +15,6 @@ export default function Game() {
   const { code } = useParams();
   const navigate = useNavigate();
   const socket = getSocket();
-
   const { user, authReady } = useAuth();
 
   const {
@@ -24,11 +23,33 @@ export default function Game() {
     setIsDrawer,
     setWordChoices,
     reset,
+    patchGame, // make sure this exists in store
   } = useGameStore();
 
   const joinedRef = useRef(false);
   const exitingRef = useRef(false);
   const historyLockedRef = useRef(false);
+
+  /* ================= GAME MONETIZE PAUSE/RESUME ================= */
+  useEffect(() => {
+    const pauseGame = () => {
+      console.log("Ad playing → pause game");
+      patchGame({ guessingAllowed: false, adPaused: true });
+    };
+
+    const resumeGame = () => {
+      console.log("Ad finished → resume game");
+      patchGame({ adPaused: false });
+    };
+
+    window.addEventListener("GM_PAUSE", pauseGame);
+    window.addEventListener("GM_RESUME", resumeGame);
+
+    return () => {
+      window.removeEventListener("GM_PAUSE", pauseGame);
+      window.removeEventListener("GM_RESUME", resumeGame);
+    };
+  }, [patchGame]);
 
   /* ================= SOCKET SETUP ================= */
   useEffect(() => {
@@ -170,8 +191,8 @@ export default function Game() {
 
   /* ================= THEME RESOLUTION ================= */
   const theme =
-    themes.find(t => t.id === game.theme) ||
-    themes.find(t => t.id === "classic");
+    themes.find((t) => t.id === game.theme) ||
+    themes.find((t) => t.id === "classic");
 
   const pageBackground = theme.image;
   const boardBackground = theme.board;
@@ -187,7 +208,7 @@ export default function Game() {
       {(() => {
         switch (game.mode) {
           case "Classic":
-            return <ClassicGame boardImage={theme.board} />;
+            return <ClassicGame boardImage={boardBackground} />;
 
           case "Quick":
             return <QuickGame boardImage={boardBackground} />;
