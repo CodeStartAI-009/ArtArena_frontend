@@ -4,7 +4,7 @@ import axios from "axios";
    API INSTANCE
 ========================= */
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5090",
+  baseURL:  "https://artarena-backend.onrender.com" || "http://localhost:5090",
 });
 
 /* =========================

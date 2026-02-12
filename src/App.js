@@ -16,12 +16,17 @@ import RequireLandscape from "./RequireLandscape";
 import { useAuth } from "./context/AuthContext";
 import useAutoAuth from "./hooks/useAutoAuth";
 
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://artarena-backend.onrender.com";
 
 export default function App() {
   const { authReady } = useAuth();
   const location = useLocation();
 
-  /* ================= CAPTURE REFERRAL CODE (RUN FIRST) ================= */
+  /* ======================================================
+     1️⃣ CAPTURE REFERRAL CODE (RUN FIRST)
+  ====================================================== */
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const ref = params.get("ref");
@@ -31,37 +36,51 @@ export default function App() {
     }
   }, [location.search]);
 
-  /* ================= DISABLE RIGHT CLICK / INSPECT (DETERRENT) ================= */
-  
-  /* ================= AUTO AUTH (guest / token) ================= */
+  /* ======================================================
+     2️⃣ WAKE BACKEND (RENDER COLD START FIX)
+     - Only runs once on initial load
+  ====================================================== */
+  useEffect(() => {
+    fetch(`${API_URL}/health`)
+      .then(() => {
+        console.log("Backend ready");
+      })
+      .catch(() => {
+        console.log("Backend waking up...");
+      });
+  }, []);
+
+  /* ======================================================
+     3️⃣ AUTO AUTH (guest / token restore)
+  ====================================================== */
   useAutoAuth();
 
-  /* ================= SPLASH ================= */
+  /* ======================================================
+     4️⃣ SPLASH WHILE AUTH INITIALIZING
+  ====================================================== */
   if (!authReady) {
     return <Splash />;
   }
 
+  /* ======================================================
+     5️⃣ MAIN APP
+  ====================================================== */
   return (
-    <>
-      {/* ✅ Load AdSense ONCE globally */}
-     
-      {/* ✅ LANDSCAPE REQUIRED FOR ENTIRE APP */}
-      <RequireLandscape>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/lobby/:code" element={<Lobby />} />
-          <Route path="/game/:code" element={<Game />} />
-          <Route path="/store" element={<Store />} />
-          <Route path="/auth/success" element={<AuthSuccess />} />
-          <Route path="/features" element={<Features />} />
-          <Route path="/faq" element={<Faq />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<Privacy />} />
+    <RequireLandscape>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/lobby/:code" element={<Lobby />} />
+        <Route path="/game/:code" element={<Game />} />
+        <Route path="/store" element={<Store />} />
+        <Route path="/auth/success" element={<AuthSuccess />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/faq" element={<Faq />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
 
-          {/* fallback */}
-          <Route path="*" element={<Home />} />
-        </Routes>
-      </RequireLandscape>
-    </>
+        {/* fallback */}
+        <Route path="*" element={<Home />} />
+      </Routes>
+    </RequireLandscape>
   );
 }
