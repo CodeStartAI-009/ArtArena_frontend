@@ -1,76 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
+<head>
+  <meta charset="utf-8" />
 
-    <title>Art Arena</title>
+  <title>Art Arena</title>
 
-    <!-- VIEWPORT -->
-    <meta
-      name="viewport"
-      content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
+  <!-- VIEWPORT -->
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-    <!-- THEME -->
-    <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#000000" />
 
-    <!-- SEO -->
-    <meta
-      name="description"
-      content="Art Arena — a real-time multiplayer drawing and guessing game."
-    />
+  <meta name="description"
+        content="Art Arena — a real-time multiplayer drawing and guessing game." />
 
-    <!-- PWA -->
-    <link rel="icon" href="%PUBLIC_URL%/logo.png" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.png" />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <!-- ICONS -->
+  <link rel="icon" href="%PUBLIC_URL%/logo.png" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.png" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
-    <!-- MOBILE FULLSCREEN -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="mobile-web-app-capable" content="yes" />
+  <!-- =========================
+       GOOGLE ANALYTICS
+  ========================== -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3CJN008N0X"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-3CJN008N0X");
+  </script>
 
-    <!-- =========================
-         GAMEMONETIZE SDK
-    ========================== -->
-    <script type="text/javascript">
-      window.SDK_OPTIONS = {
-        gameId: "40uu3xrskhygp92m800c25xyzrqld9f8",
-        onEvent: function (a) {
-          switch (a.name) {
-            case "SDK_GAME_PAUSE":
-              window.dispatchEvent(new Event("GM_PAUSE"));
-              break;
+  <!-- =========================
+       ADSENSE
+  ========================== -->
+  <script async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8525673711213815"
+          crossorigin="anonymous">
+  </script>
 
-            case "SDK_GAME_START":
-              window.dispatchEvent(new Event("GM_RESUME"));
-              break;
+  <!-- =========================
+       MONETAG VIGNETTE
+  ========================== -->
+  <script>
+    (function(s){
+      s.dataset.zone='10599539';
+      s.src='https://gizokraijaw.net/vignette.min.js';
+    })(
+      document.head.appendChild(document.createElement('script'))
+    );
+  </script>
 
-            case "SDK_READY":
-              console.log("GameMonetize SDK Ready");
-              break;
-          }
+  <!-- =========================
+       GAMEMONETIZE SDK
+  ========================== -->
+  <script>
+    window.SDK_OPTIONS = {
+      gameId: "40uu3xrskhygp92m800c25xyzrqld9f8",
+      onEvent: function (a) {
+        switch (a.name) {
+          case "SDK_GAME_PAUSE":
+            window.dispatchEvent(new Event("GM_PAUSE"));
+            break;
+
+          case "SDK_GAME_START":
+            window.dispatchEvent(new Event("GM_RESUME"));
+            break;
+
+          case "SDK_READY":
+            console.log("GameMonetize SDK Ready");
+            break;
         }
-      };
+      }
+    };
 
-      (function (a, b, c) {
-        var d = a.getElementsByTagName(b)[0];
-        if (!a.getElementById(c)) {
-          var s = a.createElement(b);
-          s.id = c;
-          s.src = "https://api.gamemonetize.com/sdk.js";
-          d.parentNode.insertBefore(s, d);
-        }
-      })(document, "script", "gamemonetize-sdk");
-    </script>
+    (function (a, b, c) {
+      var d = a.getElementsByTagName(b)[0];
+      if (!a.getElementById(c)) {
+        var s = a.createElement(b);
+        s.id = c;
+        s.src = "https://api.gamemonetize.com/sdk.js";
+        d.parentNode.insertBefore(s, d);
+      }
+    })(document, "script", "gamemonetize-sdk");
+  </script>
 
-  </head>
+</head>
 
-  <body>
-    <noscript>
-      You need to enable JavaScript to run Art Arena.
-    </noscript>
+<body>
+  <noscript>
+    You need to enable JavaScript to run Art Arena.
+  </noscript>
 
-    <div id="root"></div>
-  </body>
+  <div id="root"></div>
+</body>
 </html>

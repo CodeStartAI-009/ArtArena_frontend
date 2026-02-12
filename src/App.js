@@ -15,7 +15,7 @@ import RequireLandscape from "./RequireLandscape";
 
 import { useAuth } from "./context/AuthContext";
 import useAutoAuth from "./hooks/useAutoAuth";
-import AdSenseLoader from "./AdSense";
+
 
 export default function App() {
   const { authReady } = useAuth();
@@ -44,8 +44,7 @@ export default function App() {
   return (
     <>
       {/* ✅ Load AdSense ONCE globally */}
-      <AdSenseLoader />
-
+     
       {/* ✅ LANDSCAPE REQUIRED FOR ENTIRE APP */}
       <RequireLandscape>
         <Routes>
