@@ -41,7 +41,7 @@ export default function App() {
      - Only runs once on initial load
   ====================================================== */
   useEffect(() => {
-    fetch(`${API_URL}/health`)
+    fetch(`https://artarena-backend.onrender.com/health`)
       .then(() => {
         console.log("Backend ready");
       })
