@@ -16,9 +16,7 @@ import RequireLandscape from "./RequireLandscape";
 import { useAuth } from "./context/AuthContext";
 import useAutoAuth from "./hooks/useAutoAuth";
 
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "https://artarena-backend.onrender.com";
+const API_URL ="https://artarena-backend.onrender.com";
 
 export default function App() {
   const { authReady } = useAuth();
@@ -41,7 +39,7 @@ export default function App() {
      - Only runs once on initial load
   ====================================================== */
   useEffect(() => {
-    fetch(`https://artarena-backend.onrender.com/health`)
+    fetch(`${API_URL}/health`)
       .then(() => {
         console.log("Backend ready");
       })
