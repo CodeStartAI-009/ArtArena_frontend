@@ -1,12 +1,16 @@
- /* ================= GLOBAL SAFETY ================= */
+/* ===============================
+   GLOBAL SAFETY
+================================ */
 
 html, body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* prevents horizontal scroll */
+  overflow-x: hidden;
 }
 
-/* ================= ROOT ================= */
+/* ===============================
+   ROOT
+================================ */
 
 .lobby-root {
   width: 100%;
@@ -18,7 +22,7 @@ html, body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* OVERLAY */
+/* Background overlay */
 .lobby-root::after {
   content: "";
   position: absolute;
@@ -32,437 +36,205 @@ html, body {
   z-index: 0;
 }
 
-/* =========================================================
-   SIDE ADS (DESKTOP ONLY)
-========================================================= */
+/* ===============================
+   TITLE BAR
+================================ */
 
-.lobby-side-ad {
+.lobby-title {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 24px;
+  align-items: center;
+
+  background: linear-gradient(180deg, #3c7df0, #2456b5);
+  padding: 14px 32px;
+  border-radius: 22px;
+
+  color: white;
+  font-weight: 900;
+  z-index: 2;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.25),
+    0 14px 35px rgba(0,0,0,0.45);
+}
+
+/* ===============================
+   PLAYERS PANEL
+================================ */
+
+.players-panel {
+  position: absolute;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 380px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(35, 65, 120, 0.9),
+    rgba(20, 40, 80, 0.9)
+  );
+
+  border-radius: 26px;
+  padding: 20px 18px 22px;
+
+  color: white;
+  z-index: 2;
+
+  backdrop-filter: blur(10px);
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.15),
+    0 30px 70px rgba(0,0,0,0.6);
+}
+
+.players-panel h3 {
+  text-align: center;
+  margin-bottom: 14px;
+  font-weight: 900;
+  font-size: 18px;
+}
+
+/* ===============================
+   PLAYER ROW
+================================ */
+
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.18),
+    rgba(255,255,255,0.08)
+  );
+
+  padding: 12px 16px;
+  border-radius: 16px;
+  margin-bottom: 10px;
+  font-weight: 800;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    0 6px 14px rgba(0,0,0,0.35);
+}
+
+.player-index {
+  background: linear-gradient(180deg, #ffe16a, #ffb703);
+  color: black;
+
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 900;
+}
+
+.player-name {
+  flex: 1;
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===============================
+   FOOTER
+================================ */
+
+.lobby-footer {
+  position: absolute;
+  bottom: 120px; /* leaves space for ad */
+  width: 100%;
+  text-align: center;
+
+  color: white;
+  font-size: 18px;
+  font-weight: 900;
+  z-index: 2;
+
+  text-shadow: 0 6px 16px rgba(0,0,0,0.7);
+}
+
+/* ===============================
+   LOADING
+================================ */
+
+.lobby-loading {
+  width: 100%;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #0b1220;
+  color: white;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+/* ===============================
+   BOTTOM BANNER AD
+================================ */
+
+.lobby-bottom-ad {
   position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 160px;
-  height: 600px;
-  z-index: 3;
-}
-
-.lobby-side-ad.left {
-  left: 10px;
-}
-
-.lobby-side-ad.right {
-  right: 10px;
-}
-
-/* Hide ads on tablet/mobile */
-@media (max-width: 1199px) {
-  .lobby-side-ad {
-    display: none;
-  }
-}
-
-/* ================= TITLE BAR ================= */
-
-.lobby-title {
-  position: absolute;
-  top: 18px;
+  bottom: 1px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  gap: 24px;
-  align-items: center;
-  background: linear-gradient(180deg, #3c7df0, #2456b5);
-  padding: 14px 32px;
-  border-radius: 22px;
-  color: white;
-  font-weight: 900;
-  z-index: 2;
-  box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.25),
-    0 14px 35px rgba(0,0,0,0.45);
+
+  width: 728px;
+  height: 90px;
+  z-index: 5;
 }
 
-.title-left {
-  font-size: 20px;
-}
+/* ===============================
+   RESPONSIVE
+================================ */
 
-.title-right {
-  font-size: 15px;
-  color: #ffe16a;
-  opacity: 0.95;
-}
-
-/* ================= PLAYERS PANEL ================= */
-
-.players-panel {
-  position: absolute;
-  top: 120px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 380px;
-  background: linear-gradient(
-    180deg,
-    rgba(35, 65, 120, 0.9),
-    rgba(20, 40, 80, 0.9)
-  );
-  border-radius: 26px;
-  padding: 20px 18px 22px;
-  color: white;
-  z-index: 2;
-  backdrop-filter: blur(10px);
-  box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.15),
-    0 30px 70px rgba(0,0,0,0.6);
-}
-
-.players-panel h3 {
-  text-align: center;
-  margin-bottom: 14px;
-  font-weight: 900;
-  font-size: 18px;
-  letter-spacing: 0.4px;
-}
-
-/* ================= PLAYER ROW ================= */
-
-.player-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.18),
-    rgba(255,255,255,0.08)
-  );
-  padding: 12px 16px;
-  border-radius: 16px;
-  margin-bottom: 10px;
-  font-weight: 800;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.2),
-    0 6px 14px rgba(0,0,0,0.35);
-}
-
-.player-index {
-  background: linear-gradient(180deg, #ffe16a, #ffb703);
-  color: black;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.5),
-    0 4px 8px rgba(0,0,0,0.4);
-}
-
-.player-name {
-  flex: 1;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ================= FOOTER ================= */
-
-.lobby-footer {
-  position: absolute;
-  bottom: 26px;
-  width: 100%;
-  text-align: center;
-  color: white;
-  font-size: 18px;
-  font-weight: 900;
-  z-index: 2;
-  text-shadow: 0 6px 16px rgba(0,0,0,0.7);
-  letter-spacing: 0.4px;
-}
-
-/* ================= LOADING ================= */
-
-.lobby-loading {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #0b1220;
-  color: white;
-  font-size: 20px;
-  font-weight: 900;
-}
-
- 
-
-/* Hide ads on tablet/mobile */
-@media (max-width: 1199px) {
-  .lobby-side-ad {
-    display: none;
-  }
-
-  .lobby-root {
-    padding-left: 0;
-    padding-right: 0;
-  }
-}
-
-/* ================= TITLE BAR ================= */
-
-.lobby-title {
-  position: absolute;
-  top: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 24px;
-  align-items: center;
-  background: linear-gradient(180deg, #3c7df0, #2456b5);
-  padding: 14px 32px;
-  border-radius: 22px;
-  color: white;
-  font-weight: 900;
-  z-index: 2;
-  box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.25),
-    0 14px 35px rgba(0,0,0,0.45);
-}
-
-.title-left {
-  font-size: 20px;
-}
-
-.title-right {
-  font-size: 15px;
-  color: #ffe16a;
-  opacity: 0.95;
-}
-
-/* ================= PLAYERS PANEL ================= */
-
-.players-panel {
-  position: absolute;
-  top: 120px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 380px;
-  background: linear-gradient(
-    180deg,
-    rgba(35, 65, 120, 0.9),
-    rgba(20, 40, 80, 0.9)
-  );
-  border-radius: 26px;
-  padding: 20px 18px 22px;
-  color: white;
-  z-index: 2;
-  backdrop-filter: blur(10px);
-  box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.15),
-    0 30px 70px rgba(0,0,0,0.6);
-}
-
-.players-panel h3 {
-  text-align: center;
-  margin-bottom: 14px;
-  font-weight: 900;
-  font-size: 18px;
-  letter-spacing: 0.4px;
-}
-
-/* ================= PLAYER ROW ================= */
-
-.player-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.18),
-    rgba(255,255,255,0.08)
-  );
-  padding: 12px 16px;
-  border-radius: 16px;
-  margin-bottom: 10px;
-  font-weight: 800;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.2),
-    0 6px 14px rgba(0,0,0,0.35);
-}
-
-.player-index {
-  background: linear-gradient(180deg, #ffe16a, #ffb703);
-  color: black;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.5),
-    0 4px 8px rgba(0,0,0,0.4);
-}
-
-.player-name {
-  flex: 1;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ================= FOOTER ================= */
-
-.lobby-footer {
-  position: absolute;
-  bottom: 26px;
-  width: 100%;
-  text-align: center;
-  color: white;
-  font-size: 18px;
-  font-weight: 900;
-  z-index: 2;
-  text-shadow: 0 6px 16px rgba(0,0,0,0.7);
-  letter-spacing: 0.4px;
-}
-
-/* ================= LOADING ================= */
-
-.lobby-loading {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #0b1220;
-  color: white;
-  font-size: 20px;
-  font-weight: 900;
-}
-
-/* =========================================================
-   RESPONSIVE — PORTRAIT ONLY
-========================================================= */
-
-/* ================= TABLET PORTRAIT ================= */
+/* Tablet portrait */
 @media (max-width: 1024px) and (orientation: portrait) {
 
-  .lobby-title {
-    top: 14px;
-    padding: 12px 26px;
-    border-radius: 18px;
-  }
-
-  .title-left {
-    font-size: 18px;
-  }
-
-  .title-right {
-    font-size: 14px;
-  }
-
   .players-panel {
-    top: 110px;
     width: 340px;
-    padding: 18px 16px 20px;
-    border-radius: 22px;
-  }
-
-  .players-panel h3 {
-    font-size: 17px;
-  }
-
-  .player-row {
-    padding: 10px 14px;
-  }
-
-  .player-name {
-    font-size: 15px;
   }
 
   .lobby-footer {
+    bottom: 90px;
     font-size: 16px;
-    bottom: 22px;
   }
 }
 
-/* ================= MOBILE PORTRAIT ================= */
-@media (max-width: 715px) and (orientation: portrait) {
-
-  .lobby-title {
-    top: 12px;
-    padding: 10px 20px;
-    border-radius: 16px;
-    gap: 14px;
-  }
-
-  .title-left {
-    font-size: 16px;
-  }
-
-  .title-right {
-    font-size: 13px;
-  }
+/* Mobile portrait */
+@media (max-width: 768px) {
 
   .players-panel {
-    top: 100px;
     width: 88%;
-    padding: 16px 14px 18px;
-    border-radius: 20px;
   }
 
-  .players-panel h3 {
-    font-size: 16px;
-  }
-
-  .player-row {
-    padding: 10px 12px;
-    border-radius: 14px;
-  }
-
-  .player-index {
-    width: 24px;
-    height: 24px;
-    font-size: 13px;
-  }
-
-  .player-name {
-    font-size: 14px;
+  .lobby-bottom-ad {
+    width: 320px;
+    height: 50px;
   }
 
   .lobby-footer {
+    bottom: 70px;
     font-size: 15px;
-    bottom: 20px;
   }
 }
 
-/* ================= SMALL PHONE PORTRAIT ================= */
-@media (max-width: 360px) and (orientation: portrait) {
-
-  .lobby-title {
-    padding: 8px 16px;
-  }
-
-  .title-left {
-    font-size: 15px;
-  }
-
-  .title-right {
-    font-size: 12px;
-  }
-
-  .players-panel {
-    top: 90px;
-    padding: 14px 12px;
-  }
+/* Small phones */
+@media (max-width: 360px) {
 
   .player-name {
     font-size: 13px;

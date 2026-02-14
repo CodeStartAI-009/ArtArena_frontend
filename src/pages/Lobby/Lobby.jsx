@@ -20,9 +20,14 @@ export default function Lobby() {
   const players = Array.isArray(room?.players) ? room.players : [];
   const maxPlayers = room?.maxPlayers ?? "-";
 
-  const isHost = room?.hostId === user?._id;
+  /* ================= HOST CHECK ================= */
+  const isHost =
+    String(room?.hostId) === String(user?._id);
+
+  const isPublic = room?.mode === "Public";
 
   const canStart =
+    !isPublic && // host start only for private rooms
     isHost &&
     players.length >= 2 &&
     room?.status === "lobby";
@@ -39,40 +44,40 @@ export default function Lobby() {
     setIsTouchDevice(touch);
   }, []);
 
-  /* ================= SIDE ADS ================= */
+  /* ================= BOTTOM BANNER AD ================= */
   useEffect(() => {
-    const container = document.getElementById("lobby-left-ad");
+    const container = document.getElementById("lobby-bottom-ad");
     if (!container) return;
-  
-    // Force reset for SPA
+
     container.innerHTML = "";
-  
-    const key = "629768cab9ae71c8053dc803e3186ffe";
-  
-    const loadAd = () => {
+
+    const key = "0b79b01c3ecc8c76d45be1df8477b24f";
+
+    const isMobile = window.innerWidth <= 768;
+    const width = isMobile ? 320 : 728;
+    const height = isMobile ? 50 : 90;
+
+    const timer = setTimeout(() => {
       window.atOptions = {
         key,
         format: "iframe",
-        height: 600,
-        width: 160,
+        height,
+        width,
         params: {}
       };
-  
+
       const script = document.createElement("script");
       script.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
       script.async = true;
-  
+
       container.appendChild(script);
-    };
-  
-    const timer = setTimeout(loadAd, 150);
-  
+    }, 200);
+
     return () => {
       clearTimeout(timer);
-      container.innerHTML = ""; // VERY IMPORTANT
+      container.innerHTML = "";
     };
   }, []);
-  
 
   /* ================= SOCKET ================= */
   useEffect(() => {
@@ -129,7 +134,8 @@ export default function Lobby() {
     };
 
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () =>
+      window.removeEventListener("keydown", onKeyDown);
   }, [canStart, code, socket, isTouchDevice]);
 
   /* ================= MOBILE START (TAP) ================= */
@@ -147,6 +153,17 @@ export default function Lobby() {
     );
   }
 
+  /* ================= FOOTER MESSAGE ================= */
+  const footerMessage =
+  isPublic
+    ? "Waiting for players..."
+    : isHost && players.length >= 2
+      ? isTouchDevice
+        ? "Tap anywhere to start"
+        : "Press SPACE to start the game"
+      : "Waiting for players...";
+
+
   /* ================= UI ================= */
   return (
     <div
@@ -159,15 +176,9 @@ export default function Lobby() {
           canStart && isTouchDevice ? "pointer" : "default",
       }}
     >
-
-      {/* LEFT SIDE AD */}
-      <div className="lobby-side-ad left">
-        <div id="lobby-left-ad"></div>
-      </div>
-
-      {/* RIGHT SIDE AD */}
-      <div className="lobby-side-ad right">
-        <div id="lobby-right-ad"></div>
+      {/* ================= BOTTOM AD ================= */}
+      <div className="lobby-bottom-ad">
+        <div id="lobby-bottom-ad"></div>
       </div>
 
       <div className="lobby-title">
@@ -198,11 +209,7 @@ export default function Lobby() {
       </div>
 
       <div className="lobby-footer">
-        {canStart
-          ? isTouchDevice
-            ? "Tap anywhere to start"
-            : "Press SPACE to start the game"
-          : "Waiting for players…"}
+        {footerMessage}
       </div>
     </div>
   );
