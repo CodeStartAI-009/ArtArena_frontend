@@ -1,99 +1,151 @@
-.splash-root {
-    width: 100vw;
-    height: 100vh;
-    background: linear-gradient(180deg, #0b4fa3, #083a78);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    font-family: system-ui, sans-serif;
-  }
-  
-  .splash-center {
-    text-align: center;
-  }
-  
-  .splash-title {
-    width: 300px;
-    max-width: 80%;
-    margin-bottom: 28px;
-  }
-  
-  /* BUTTONS */
-  .splash-buttons {
-    display: flex;
-    gap: 18px;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .store-btn {
-    height: 48px;
-  }
-  
-  .discord-icon {
-    width: 42px;
-    height: 42px;
-    transition: transform 0.15s ease;
-  }
-  
-  .discord-icon:hover {
-    transform: scale(1.05);
-  }
-/* BOTTOM LEFT */
-.splash-bottom-left {
-    position: absolute;
-    bottom: 32px;
-    left: 32px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    color: #ffffff;
-    font-weight: 800;
-    font-size: 18px; /* ⬆ text size */
-  }
-  
-  .art-loader {
-    width: 74px;   /* ⬆ larger icon */
-    height: 74px;
-    animation: float 1.2s ease-in-out infinite;
-  }
-  
-  /* BOTTOM RIGHT */
-  .splash-bottom-right {
-    position: absolute;
-    bottom: 42px;
-    right: 42px;
-  }
-  
-  .splash-bottom-right img {
-    height: 56px;  /* ⬆ much larger logo */
-    opacity: 1;
-  }
-  .store-link-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-  }
-  
-  /* ANIMATION */
-  @keyframes float {
-    0% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-4px);
-    }
-    100% {
-      transform: translateY(0);
-    }
-  }
-  /* =========================================================
-   SPLASH RESPONSIVE — PORTRAIT ONLY
-   Landscape behaves like desktop
+/* =========================================================
+   ROOT LAYOUT
 ========================================================= */
 
+.splash-root {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(180deg, #0b4fa3, #083a78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-family: system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* =========================================================
+   SIDE ADS (DESKTOP ONLY)
+========================================================= */
+
+.side-ad {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 160px;
+  height: 600px;
+  z-index: 2;
+}
+
+.left-ad {
+  left: 10px;
+}
+
+.right-ad {
+  right: 10px;
+}
+
+/* Push center content so ads don't overlap */
+@media (min-width: 1200px) {
+  .splash-center {
+    margin: 0 200px;
+  }
+}
+
+/* Hide ads on tablets & mobile */
+@media (max-width: 1199px) {
+  .side-ad {
+    display: none;
+  }
+}
+
+/* =========================================================
+   CENTER CONTENT
+========================================================= */
+
+.splash-center {
+  text-align: center;
+  z-index: 3;
+}
+
+.splash-title {
+  width: 300px;
+  max-width: 80%;
+  margin-bottom: 28px;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.splash-buttons {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  align-items: center;
+}
+
+.store-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.store-btn {
+  height: 48px;
+}
+
+.discord-icon {
+  width: 42px;
+  height: 42px;
+  transition: transform 0.15s ease;
+}
+
+.discord-icon:hover {
+  transform: scale(1.05);
+}
+
+/* =========================================================
+   BOTTOM LEFT
+========================================================= */
+
+.splash-bottom-left {
+  position: absolute;
+  bottom: 32px;
+  left: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.art-loader {
+  width: 74px;
+  height: 74px;
+  animation: float 1.2s ease-in-out infinite;
+}
+
+/* =========================================================
+   BOTTOM RIGHT
+========================================================= */
+
+.splash-bottom-right {
+  position: absolute;
+  bottom: 42px;
+  right: 42px;
+}
+
+.splash-bottom-right img {
+  height: 56px;
+  opacity: 1;
+}
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+/* =========================================================
+   SPLASH RESPONSIVE — PORTRAIT ONLY
+========================================================= */
 
 /* ================= TABLET PORTRAIT ================= */
 @media (max-width: 1024px) and (orientation: portrait) {
@@ -132,7 +184,6 @@
     height: 48px;
   }
 }
-
 
 /* ================= MOBILE PORTRAIT ================= */
 @media (max-width: 715px) and (orientation: portrait) {
@@ -176,7 +227,6 @@
     height: 42px;
   }
 }
-
 
 /* ================= SMALL PHONES PORTRAIT ================= */
 @media (max-width: 360px) and (orientation: portrait) {

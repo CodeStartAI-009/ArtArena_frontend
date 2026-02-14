@@ -369,6 +369,26 @@
   background: linear-gradient(180deg, #22c55e, #16a34a);
   cursor: pointer;
 }
+/* =========================================================
+   SMALL BOTTOM LEFT AD
+========================================================= */
+
+.game-bottom-ad {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  width: 320px;
+  height: 50px;
+  z-index: 10;
+}
+
+/* Center on very small screens */
+@media (max-width: 480px) {
+  .game-bottom-ad {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
 
 /* ===============================
    MOBILE

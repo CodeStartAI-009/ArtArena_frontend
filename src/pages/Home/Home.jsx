@@ -58,6 +58,32 @@ export default function Home() {
       document.exitFullscreen().catch(() => {});
     }
   };
+  /* ================= RIGHT SIDE AD ================= */
+useEffect(() => {
+  const loadAd = () => {
+    const container = document.getElementById("home-right-ad");
+    if (!container) return;
+
+    // Prevent duplicate loading
+    if (container.children.length > 0) return;
+
+    window.atOptions = {
+      key: "629768cab9ae71c8053dc803e3186ffe",
+      format: "iframe",
+      height: 600,
+      width: 160,
+      params: {}
+    };
+
+    const script = document.createElement("script");
+    script.src = "https://www.highperformanceformat.com/629768cab9ae71c8053dc803e3186ffe/invoke.js";
+    script.async = true;
+
+    container.appendChild(script);
+  };
+
+  loadAd();
+}, []);
 
   /* ================= SOCKET ================= */
   useEffect(() => {
@@ -155,6 +181,11 @@ export default function Home() {
         </div>
       )}
     </div>
+    {/* ================= RIGHT SIDE AD ================= */}
+<div className="home-side-ad">
+  <div id="home-right-ad"></div>
+</div>
+
   </div>
 )}
 

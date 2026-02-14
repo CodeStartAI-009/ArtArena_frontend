@@ -23,22 +23,43 @@ export default function Game() {
     setIsDrawer,
     setWordChoices,
     reset,
-    patchGame, // make sure this exists in store
+    patchGame,
   } = useGameStore();
 
   const joinedRef = useRef(false);
   const exitingRef = useRef(false);
   const historyLockedRef = useRef(false);
 
+  /* ================= SMALL BOTTOM-LEFT BANNER AD ================= */
+  useEffect(() => {
+    const container = document.getElementById("game-bottom-ad");
+    if (!container) return;
+
+    if (container.children.length > 0) return;
+
+    window.atOptions = {
+      key: "48bea9e4f3c5420f375a4a869b63e6a5",
+      format: "iframe",
+      height: 50,
+      width: 320,
+      params: {}
+    };
+
+    const script = document.createElement("script");
+    script.src =
+      "https://www.highperformanceformat.com/48bea9e4f3c5420f375a4a869b63e6a5/invoke.js";
+    script.async = true;
+
+    container.appendChild(script);
+  }, []);
+
   /* ================= GAME MONETIZE PAUSE/RESUME ================= */
   useEffect(() => {
     const pauseGame = () => {
-      console.log("Ad playing → pause game");
       patchGame({ guessingAllowed: false, adPaused: true });
     };
 
     const resumeGame = () => {
-      console.log("Ad finished → resume game");
       patchGame({ adPaused: false });
     };
 
@@ -60,11 +81,7 @@ export default function Game() {
     const onGameState = (state) => {
       if (!state) return;
 
-      setGame({
-        ...state,
-        selfId: userId,
-      });
-
+      setGame({ ...state, selfId: userId });
       setIsDrawer(String(state.drawerId) === userId);
     };
 
@@ -97,22 +114,17 @@ export default function Game() {
     };
 
     const onGameEnded = () => {
-      console.log("Game ended → showing ad");
-    
-      // Show interstitial ad
       if (typeof window.sdk !== "undefined" && window.sdk.showAd) {
         window.sdk.showAd();
       }
-    
+
       exitingRef.current = true;
-    
-      // Delay navigation slightly so ad can trigger
+
       setTimeout(() => {
         reset();
         navigate("/", { replace: true });
       }, 1000);
     };
-    
 
     const onForceExit = () => {
       exitingRef.current = true;
@@ -201,7 +213,6 @@ export default function Game() {
     return <div className="game-loading">Loading game…</div>;
   }
 
-  /* ================= THEME RESOLUTION ================= */
   const theme =
     themes.find((t) => t.id === game.theme) ||
     themes.find((t) => t.id === "classic");
@@ -221,22 +232,23 @@ export default function Game() {
         switch (game.mode) {
           case "Classic":
             return <ClassicGame boardImage={boardBackground} />;
-
           case "Quick":
             return <QuickGame boardImage={boardBackground} />;
-
           case "Kids":
             return <KidsGame boardImage={boardBackground} />;
-
           case "Together":
             return game.gameplay === "Drawing"
               ? <DrawingGame boardImage={boardBackground} />
               : <OpenCanvasGame boardImage={boardBackground} />;
-
           default:
             return <div>Unknown game mode</div>;
         }
       })()}
+
+      {/* ================= BOTTOM LEFT AD ================= */}
+      <div className="game-bottom-ad">
+        <div id="game-bottom-ad"></div>
+      </div>
     </div>
   );
 }

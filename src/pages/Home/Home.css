@@ -635,6 +635,37 @@ text-align: center;
 opacity: 0.9;
 line-height: 1.4;
 }
+/* =========================================================
+   RIGHT SIDE AD (DESKTOP ONLY)
+========================================================= */
+
+.home-side-ad {
+  position: fixed;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 160px;
+  height: 600px;
+  z-index: 2;
+}
+
+/* Prevent overlap on large screens */
+@media (min-width: 1200px) {
+  .home-root {
+    margin-right: 180px;
+  }
+}
+
+/* Hide on tablet & mobile */
+@media (max-width: 1199px) {
+  .home-side-ad {
+    display: none;
+  }
+
+  .home-root {
+    margin-right: 0;
+  }
+}
 
 /* ================= MOBILE ================= */
 /* =========================================================

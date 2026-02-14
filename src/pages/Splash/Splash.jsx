@@ -1,31 +1,59 @@
 // src/pages/Splash/Splash.jsx
+import { useEffect } from "react";
 import "./Splash.css";
 
-// IMPORT ASSETS
 import titleLogo from "../../assets/logo/logo.png";
 import loaderIcon from "../../assets/icons/image-loader.png";
 import companyLogo from "../../assets/logo/company.jpeg";
 
 export default function Splash() {
+
+  useEffect(() => {
+    const loadAd = (containerId, key) => {
+      if (!document.getElementById(containerId)) return;
+
+      window.atOptions = {
+        key: key,
+        format: "iframe",
+        height: 600,
+        width: 160,
+        params: {}
+      };
+
+      const script = document.createElement("script");
+      script.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
+      script.async = true;
+
+      document.getElementById(containerId).appendChild(script);
+    };
+
+    // LEFT + RIGHT ads
+    loadAd("left-ad-container", "629768cab9ae71c8053dc803e3186ffe");
+    loadAd("right-ad-container", "629768cab9ae71c8053dc803e3186ffe");
+
+  }, []);
+
   const handlePlayStoreClick = () => {
-    // Optional: show toast or alert
-    // alert("Android app coming soon!");
+    // Optional
   };
 
   return (
     <div className="splash-root">
-      {/* CENTER CONTENT */}
+
+      {/* LEFT SIDE AD */}
+      <div className="side-ad left-ad">
+        <div id="left-ad-container"></div>
+      </div>
+
+      {/* CENTER CONTENT (UNCHANGED LOOK) */}
       <div className="splash-center">
-        {/* TITLE */}
         <img
           src={titleLogo}
           alt="Art Arena"
           className="splash-title"
         />
 
-        {/* BUTTONS */}
         <div className="splash-buttons">
-          {/* GOOGLE PLAY (COMING SOON) */}
           <button
             type="button"
             onClick={handlePlayStoreClick}
@@ -39,7 +67,6 @@ export default function Splash() {
             />
           </button>
 
-          {/* DISCORD (REAL LINK) */}
           <a
             href="https://discord.gg/5rPSTx7n"
             target="_blank"
@@ -53,6 +80,11 @@ export default function Splash() {
             />
           </a>
         </div>
+      </div>
+
+      {/* RIGHT SIDE AD */}
+      <div className="side-ad right-ad">
+        <div id="right-ad-container"></div>
       </div>
 
       {/* BOTTOM LEFT LOADING */}
@@ -72,6 +104,7 @@ export default function Splash() {
           alt="Studio Logo"
         />
       </div>
+
     </div>
   );
 }

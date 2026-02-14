@@ -161,6 +161,45 @@
   font-weight: 900;
 }
 /* =========================================================
+   SIDE ADS (DESKTOP ONLY)
+========================================================= */
+
+.lobby-side-ad {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 160px;
+  height: 600px;
+  z-index: 2;
+}
+
+.lobby-side-ad.left {
+  left: 10px;
+}
+
+.lobby-side-ad.right {
+  right: 10px;
+}
+
+/* Push content inward */
+@media (min-width: 1200px) {
+  .lobby-root {
+    margin: 0 200px;
+  }
+}
+
+/* Hide on mobile */
+@media (max-width: 1199px) {
+  .lobby-side-ad {
+    display: none;
+  }
+
+  .lobby-root {
+    margin: 0;
+  }
+}
+
+/* =========================================================
    RESPONSIVE — PORTRAIT ONLY
    Landscape behaves like desktop
 ========================================================= */

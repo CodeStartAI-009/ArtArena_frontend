@@ -39,6 +39,35 @@ export default function Lobby() {
     setIsTouchDevice(touch);
   }, []);
 
+  /* ================= SIDE ADS ================= */
+  useEffect(() => {
+    const loadAd = (containerId, key) => {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      // Prevent duplicate loading
+      if (container.children.length > 0) return;
+
+      window.atOptions = {
+        key: key,
+        format: "iframe",
+        height: 600,
+        width: 160,
+        params: {}
+      };
+
+      const script = document.createElement("script");
+      script.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
+      script.async = true;
+
+      container.appendChild(script);
+    };
+
+    loadAd("lobby-left-ad", "629768cab9ae71c8053dc803e3186ffe");
+    loadAd("lobby-right-ad", "629768cab9ae71c8053dc803e3186ffe");
+
+  }, []);
+
   /* ================= SOCKET ================= */
   useEffect(() => {
     if (!authReady || !user) return;
@@ -124,6 +153,17 @@ export default function Lobby() {
           canStart && isTouchDevice ? "pointer" : "default",
       }}
     >
+
+      {/* LEFT SIDE AD */}
+      <div className="lobby-side-ad left">
+        <div id="lobby-left-ad"></div>
+      </div>
+
+      {/* RIGHT SIDE AD */}
+      <div className="lobby-side-ad right">
+        <div id="lobby-right-ad"></div>
+      </div>
+
       <div className="lobby-title">
         <span className="title-left">
           {theme.name} Arena
