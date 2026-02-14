@@ -75,7 +75,7 @@ export default function App() {
         <Route path="/faq" element={<Faq />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
-
+        <Route path="/s" element={<Splash/>}/>
         {/* fallback */}
         <Route path="*" element={<Home />} />
       </Routes>

@@ -59,31 +59,40 @@ export default function Home() {
     }
   };
   /* ================= RIGHT SIDE AD ================= */
-useEffect(() => {
-  const loadAd = () => {
+  useEffect(() => {
     const container = document.getElementById("home-right-ad");
     if (!container) return;
-
-    // Prevent duplicate loading
-    if (container.children.length > 0) return;
-
-    window.atOptions = {
-      key: "629768cab9ae71c8053dc803e3186ffe",
-      format: "iframe",
-      height: 600,
-      width: 160,
-      params: {}
+  
+    // CLEAR previous content (important for SPA)
+    container.innerHTML = "";
+  
+    const key = "789ab022c40fd79ae01b73ae88d3a054";
+  
+    const loadAd = () => {
+      window.atOptions = {
+        key,
+        format: "iframe",
+        height: 300,
+        width: 160,
+        params: {}
+      };
+  
+      const script = document.createElement("script");
+      script.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
+      script.async = true;
+  
+      container.appendChild(script);
     };
-
-    const script = document.createElement("script");
-    script.src = "https://www.highperformanceformat.com/629768cab9ae71c8053dc803e3186ffe/invoke.js";
-    script.async = true;
-
-    container.appendChild(script);
-  };
-
-  loadAd();
-}, []);
+  
+    const timer = setTimeout(loadAd, 150);
+  
+    return () => {
+      clearTimeout(timer);
+      container.innerHTML = ""; // cleanup on route change
+    };
+  }, []);
+  
+  
 
   /* ================= SOCKET ================= */
   useEffect(() => {
@@ -181,10 +190,6 @@ useEffect(() => {
         </div>
       )}
     </div>
-    {/* ================= RIGHT SIDE AD ================= */}
-<div className="home-side-ad">
-  <div id="home-right-ad"></div>
-</div>
 
   </div>
 )}
@@ -259,6 +264,11 @@ useEffect(() => {
 
       {/* ================= FOOTER ================= */}
       <div className="home-footer">
+        {/* RIGHT SIDE AD */}
+<div className="home-side-ad">
+  <div id="home-right-ad"></div>
+</div>
+
         <div className="policy-content">
           <div className="policy-links">
             <Link to="/features">Features</Link>

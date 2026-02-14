@@ -641,7 +641,7 @@ line-height: 1.4;
 
 .home-side-ad {
   position: fixed;
-  top: 50%;
+  top: 60%;
   right: 10px;
   transform: translateY(-50%);
   width: 160px;

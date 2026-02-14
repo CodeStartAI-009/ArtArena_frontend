@@ -41,32 +41,38 @@ export default function Lobby() {
 
   /* ================= SIDE ADS ================= */
   useEffect(() => {
-    const loadAd = (containerId, key) => {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-
-      // Prevent duplicate loading
-      if (container.children.length > 0) return;
-
+    const container = document.getElementById("lobby-left-ad");
+    if (!container) return;
+  
+    // Force reset for SPA
+    container.innerHTML = "";
+  
+    const key = "629768cab9ae71c8053dc803e3186ffe";
+  
+    const loadAd = () => {
       window.atOptions = {
-        key: key,
+        key,
         format: "iframe",
         height: 600,
         width: 160,
         params: {}
       };
-
+  
       const script = document.createElement("script");
       script.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
       script.async = true;
-
+  
       container.appendChild(script);
     };
-
-    loadAd("lobby-left-ad", "629768cab9ae71c8053dc803e3186ffe");
-    loadAd("lobby-right-ad", "629768cab9ae71c8053dc803e3186ffe");
-
+  
+    const timer = setTimeout(loadAd, 150);
+  
+    return () => {
+      clearTimeout(timer);
+      container.innerHTML = ""; // VERY IMPORTANT
+    };
   }, []);
+  
 
   /* ================= SOCKET ================= */
   useEffect(() => {

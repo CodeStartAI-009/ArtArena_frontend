@@ -9,33 +9,41 @@ import companyLogo from "../../assets/logo/company.jpeg";
 export default function Splash() {
 
   useEffect(() => {
-    const loadAd = (containerId, key) => {
-      if (!document.getElementById(containerId)) return;
-
+    const container = document.getElementById("right-ad-container");
+    if (!container) return;
+  
+    // Clear old content (important for SPA)
+    container.innerHTML = "";
+  
+    const key = "629768cab9ae71c8053dc803e3186ffe";
+  
+    const loadAd = () => {
       window.atOptions = {
-        key: key,
+        key,
         format: "iframe",
         height: 600,
         width: 160,
         params: {}
       };
-
+  
       const script = document.createElement("script");
       script.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
       script.async = true;
-
-      document.getElementById(containerId).appendChild(script);
+  
+      container.appendChild(script);
     };
-
-    // LEFT + RIGHT ads
-    loadAd("left-ad-container", "629768cab9ae71c8053dc803e3186ffe");
-    loadAd("right-ad-container", "629768cab9ae71c8053dc803e3186ffe");
-
+  
+    const timer = setTimeout(loadAd, 150);
+  
+    return () => {
+      clearTimeout(timer);
+      container.innerHTML = "";
+    };
+  
   }, []);
+  
 
-  const handlePlayStoreClick = () => {
-    // Optional
-  };
+  const handlePlayStoreClick = () => {};
 
   return (
     <div className="splash-root">
@@ -45,7 +53,7 @@ export default function Splash() {
         <div id="left-ad-container"></div>
       </div>
 
-      {/* CENTER CONTENT (UNCHANGED LOOK) */}
+      {/* CENTER CONTENT */}
       <div className="splash-center">
         <img
           src={titleLogo}
@@ -62,7 +70,7 @@ export default function Splash() {
           >
             <img
               src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
-              alt="Get it on Google Play (Coming Soon)"
+              alt="Get it on Google Play"
               className="store-btn"
             />
           </button>
