@@ -30,42 +30,7 @@ export default function Game() {
   const exitingRef = useRef(false);
   const historyLockedRef = useRef(false);
 
-  /* ================= SMALL BOTTOM-LEFT BANNER AD ================= */
-  useEffect(() => {
-    const container = document.getElementById("game-bottom-ad");
-    if (!container) return;
-  
-    // 🔥 Clear old ad content (important for SPA)
-    container.innerHTML = "";
-  
-    const key = "48bea9e4f3c5420f375a4a869b63e6a5";
-  
-    const loadAd = () => {
-      window.atOptions = {
-        key,
-        format: "iframe",
-        height: 50,
-        width: 320,
-        params: {}
-      };
-  
-      const script = document.createElement("script");
-      script.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
-      script.async = true;
-  
-      container.appendChild(script);
-    };
-  
-    // Small delay avoids global overwrite timing issues
-    const timer = setTimeout(loadAd, 150);
-  
-    return () => {
-      clearTimeout(timer);
-      container.innerHTML = ""; // cleanup when leaving Game page
-    };
-  
-  }, []);
-  
+   
 
   /* ================= GAME MONETIZE PAUSE/RESUME ================= */
   useEffect(() => {
@@ -260,9 +225,7 @@ export default function Game() {
       })()}
 
       {/* ================= BOTTOM LEFT AD ================= */}
-      <div className="game-bottom-ad">
-        <div id="game-bottom-ad"></div>
-      </div>
+      
     </div>
   );
 }

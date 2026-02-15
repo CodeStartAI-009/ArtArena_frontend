@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import useGameStore from "../store/store";
 
 import TopBar from "../components/TopBar";
@@ -10,20 +11,48 @@ import WordChoice from "../components/WordChoice";
 export default function ClassicGame({ boardImage }) {
   const { game, isDrawer, wordChoices } = useGameStore();
 
+  /* ================= BOTTOM LEFT AD ================= */
+  useEffect(() => {
+    const container = document.getElementById("classic-bottom-ad");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const key = "48bea9e4f3c5420f375a4a869b63e6a5";
+
+    window.atOptions = {
+      key,
+      format: "iframe",
+      height: 50,
+      width: 320,
+      params: {}
+    };
+
+    const script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
+    script.async = true;
+
+    container.appendChild(script);
+
+    return () => {
+      container.innerHTML = "";
+    };
+  }, []);
+
   if (!game) return null;
 
   const guessingAllowed = game.guessingAllowed === true;
 
   return (
     <div className="game-screen">
-      {/* ================= TOP BAR (WITH WORD MASK) ================= */}
+      {/* ================= TOP BAR ================= */}
       <TopBar
-  round={game.round}
-  wordLength={game.wordLength}
-  revealedLetters={game.revealedLetters}
-  coins={game.me?.coins}
-/>
-
+        round={game.round}
+        wordLength={game.wordLength}
+        revealedLetters={game.revealedLetters}
+        coins={game.me?.coins}
+      />
 
       {/* ================= PLAYER LIST ================= */}
       <PlayerList players={game.players} />
@@ -47,6 +76,11 @@ export default function ClassicGame({ boardImage }) {
       {!isDrawer && guessingAllowed && (
         <GuessInput roomCode={game.code} />
       )}
+
+      {/* ================= BOTTOM AD ================= */}
+      <div className="classic-bottom-ad">
+        <div id="classic-bottom-ad"></div>
+      </div>
     </div>
   );
 }

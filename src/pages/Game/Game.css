@@ -372,6 +372,21 @@
 /* =========================================================
    SMALL BOTTOM LEFT AD
 ========================================================= */
+.classic-bottom-ad {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  width: 320px;
+  height: 50px;
+  z-index: 9999;
+}
+
+@media (max-width: 480px) {
+  .classic-bottom-ad {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
 
 .game-bottom-ad {
   position: fixed;
