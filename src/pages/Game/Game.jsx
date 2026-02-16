@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getSocket } from "../../socket/socket";
 import useGameStore from "./store/store";
@@ -10,6 +10,7 @@ import QuickGame from "./Quick/QuickGame";
 import KidsGame from "./Kids/KidsGame";
 import DrawingGame from "./together/DrawingGame";
 import OpenCanvasGame from "./together/OpenCanvasGame";
+import RematchScreen from "./components/RematchScreen";
 
 export default function Game() {
   const { code } = useParams();
@@ -26,32 +27,11 @@ export default function Game() {
     patchGame,
   } = useGameStore();
 
+  const [showRematch, setShowRematch] = useState(false);
+
   const joinedRef = useRef(false);
   const exitingRef = useRef(false);
-  const historyLockedRef = useRef(false);
 
-   
-
-  /* ================= GAME MONETIZE PAUSE/RESUME ================= */
-  useEffect(() => {
-    const pauseGame = () => {
-      patchGame({ guessingAllowed: false, adPaused: true });
-    };
-
-    const resumeGame = () => {
-      patchGame({ adPaused: false });
-    };
-
-    window.addEventListener("GM_PAUSE", pauseGame);
-    window.addEventListener("GM_RESUME", resumeGame);
-
-    return () => {
-      window.removeEventListener("GM_PAUSE", pauseGame);
-      window.removeEventListener("GM_RESUME", resumeGame);
-    };
-  }, [patchGame]);
-
-  /* ================= SOCKET SETUP ================= */
   useEffect(() => {
     if (!authReady || !user?._id) return;
 
@@ -59,7 +39,6 @@ export default function Game() {
 
     const onGameState = (state) => {
       if (!state) return;
-
       setGame({ ...state, selfId: userId });
       setIsDrawer(String(state.drawerId) === userId);
     };
@@ -92,22 +71,44 @@ export default function Game() {
       useGameStore.getState().patchGame({ guessingAllowed: true });
     };
 
-    const onGameEnded = () => {
+    const onGameEnded = (data) => {
       if (typeof window.sdk !== "undefined" && window.sdk.showAd) {
         window.sdk.showAd();
       }
-
+    
+      patchGame({
+        winner: data?.winner,
+        players: data?.players,
+      });
+    
+      const rematchAllowedModes = ["Classic", "Kids", "Together"];
+    
+      const shouldShowRematch =
+        data?.type === "private" &&
+        rematchAllowedModes.includes(data?.mode);
+    
+      if (shouldShowRematch) {
+        setShowRematch(true);
+        return;
+      }
+    
       exitingRef.current = true;
-
+    
       setTimeout(() => {
         reset();
         navigate("/", { replace: true });
       }, 1000);
     };
+    
+
+    const onRematchStarted = () => {
+      setShowRematch(false);
+    };
 
     const onForceExit = () => {
       exitingRef.current = true;
       joinedRef.current = false;
+      setShowRematch(false);
       reset();
       navigate("/", { replace: true });
     };
@@ -119,6 +120,7 @@ export default function Game() {
     socket.on("WORD_CHOICES", setWordChoices);
     socket.on("GUESSING_STARTED", onGuessingStarted);
     socket.on("GAME_ENDED", onGameEnded);
+    socket.on("REMATCH_STARTED", onRematchStarted);
     socket.on("FORCE_EXIT", onForceExit);
 
     if (!joinedRef.current) {
@@ -134,6 +136,7 @@ export default function Game() {
       socket.off("WORD_CHOICES", setWordChoices);
       socket.off("GUESSING_STARTED", onGuessingStarted);
       socket.off("GAME_ENDED", onGameEnded);
+      socket.off("REMATCH_STARTED", onRematchStarted);
       socket.off("FORCE_EXIT", onForceExit);
     };
   }, [
@@ -146,48 +149,11 @@ export default function Game() {
     setGame,
     setIsDrawer,
     setWordChoices,
+    patchGame,
+    game?.type,
+    game?.mode,
   ]);
 
-  /* ================= BLOCK BACK BUTTON ================= */
-  useEffect(() => {
-    if (historyLockedRef.current) return;
-    historyLockedRef.current = true;
-
-    const handlePopState = () => {
-      if (exitingRef.current) return;
-
-      if (window.confirm("Exit the game?")) {
-        exitingRef.current = true;
-        socket.emit("GAME_EXIT", { code });
-        reset();
-        navigate("/", { replace: true });
-      } else {
-        window.history.pushState(null, "", window.location.href);
-      }
-    };
-
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", handlePopState);
-
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, [code, navigate, socket, reset]);
-
-  /* ================= TAB CLOSE WARNING ================= */
-  useEffect(() => {
-    const warn = (e) => {
-      if (!exitingRef.current) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
-    };
-
-    window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
-  }, []);
-
-  /* ================= LOADING ================= */
   if (!game) {
     return <div className="game-loading">Loading game…</div>;
   }
@@ -199,7 +165,6 @@ export default function Game() {
   const pageBackground = theme.image;
   const boardBackground = theme.board;
 
-  /* ================= RENDER ================= */
   return (
     <div
       className="game-root"
@@ -207,25 +172,29 @@ export default function Game() {
     >
       <div className="game-overlay" />
 
-      {(() => {
-        switch (game.mode) {
-          case "Classic":
-            return <ClassicGame boardImage={boardBackground} />;
-          case "Quick":
-            return <QuickGame boardImage={boardBackground} />;
-          case "Kids":
-            return <KidsGame boardImage={boardBackground} />;
-          case "Together":
-            return game.gameplay === "Drawing"
+      {!showRematch && (
+        <>
+          {game.mode === "Classic" && (
+            <ClassicGame boardImage={boardBackground} />
+          )}
+          {game.mode === "Quick" && (
+            <QuickGame boardImage={boardBackground} />
+          )}
+          {game.mode === "Kids" && (
+            <KidsGame boardImage={boardBackground} />
+          )}
+          {game.mode === "Together" &&
+            (game.gameplay === "Drawing"
               ? <DrawingGame boardImage={boardBackground} />
-              : <OpenCanvasGame boardImage={boardBackground} />;
-          default:
-            return <div>Unknown game mode</div>;
-        }
-      })()}
+              : <OpenCanvasGame boardImage={boardBackground} />)}
+        </>
+      )}
 
-      {/* ================= BOTTOM LEFT AD ================= */}
-      
+      {showRematch && (
+        <div className="rematch-overlay">
+          <RematchScreen />
+        </div>
+      )}
     </div>
   );
 }

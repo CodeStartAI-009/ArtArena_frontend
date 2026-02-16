@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSocket } from "../../../socket/socket";
 import { getPlayerIdentity } from "../../../utils/getPlayerIdentity";
@@ -13,12 +13,19 @@ export default function RematchScreen() {
   const [votes, setVotes] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
+  /* ================= SORT PLAYERS BY SCORE ================= */
+  const sortedPlayers = useMemo(() => {
+    if (!game?.players) return [];
+    return [...game.players].sort((a, b) => b.score - a.score);
+  }, [game]);
+
+  const winner = sortedPlayers[0];
+
   /* ================= SOCKET LISTENERS ================= */
   useEffect(() => {
     if (!socket.connected) socket.connect();
 
     const onRematchUpdate = ({ votes }) => {
-      // votes comes as [ [userId, decision], ... ]
       const map = {};
       votes.forEach(([id, decision]) => {
         map[id] = decision;
@@ -31,12 +38,20 @@ export default function RematchScreen() {
       navigate("/", { replace: true });
     };
 
+    const onRematchStarted = () => {
+      setSubmitted(false);
+      setVotes({});
+      // Game state will be updated by GAME_STATE event
+    };
+
     socket.on("REMATCH_UPDATE", onRematchUpdate);
     socket.on("FORCE_EXIT", onForceExit);
+    socket.on("REMATCH_STARTED", onRematchStarted);
 
     return () => {
       socket.off("REMATCH_UPDATE", onRematchUpdate);
       socket.off("FORCE_EXIT", onForceExit);
+      socket.off("REMATCH_STARTED", onRematchStarted);
     };
   }, [socket, navigate, reset]);
 
@@ -52,40 +67,77 @@ export default function RematchScreen() {
       code: game.code,
       decision, // "play" | "exit"
     });
+
+    if (decision === "exit") {
+      // Immediately move exiting player
+      reset();
+      navigate("/", { replace: true });
+    }
   };
 
   /* ================= UI ================= */
   return (
     <div className="rematch-screen">
-      <h2>Game Over</h2>
 
-      <p className="winner-text">
-        Winner: <strong>{game.players?.[0]?.username ?? "—"}</strong>
-      </p>
+      <h2>🏁 Game Over</h2>
 
-      <p>Do you want to play again?</p>
+      {/* ================= WINNER ================= */}
+      <div className="winner-section">
+        <h3>
+          Winner:{" "}
+          <strong>
+            {winner?.username ?? "—"}
+          </strong>
+        </h3>
+        <p>Score: {winner?.score ?? 0}</p>
+      </div>
 
-      {!submitted ? (
-        <div className="rematch-buttons">
-          <button
-            className="play-again-btn"
-            onClick={() => sendVote("play")}
+      {/* ================= LEADERBOARD ================= */}
+      <div className="leaderboard">
+        <h4>Final Scores</h4>
+
+        {sortedPlayers.map((p, index) => (
+          <div
+            key={p.id}
+            className={`leaderboard-row ${
+              index === 0 ? "winner-row" : ""
+            }`}
           >
-            Play Again
-          </button>
+            <span>
+              #{index + 1}{" "}
+              {p.id === player.id ? "(You)" : p.username}
+            </span>
+            <span>{p.score}</span>
+          </div>
+        ))}
+      </div>
 
-          <button
-            className="exit-btn"
-            onClick={() => sendVote("exit")}
-          >
-            Exit
-          </button>
-        </div>
-      ) : (
-        <p className="waiting-text">
-          Waiting for other players…
-        </p>
-      )}
+      {/* ================= REMATCH QUESTION ================= */}
+      <div className="rematch-section">
+        <p>Do you want to play again?</p>
+
+        {!submitted ? (
+          <div className="rematch-buttons">
+            <button
+              className="play-again-btn"
+              onClick={() => sendVote("play")}
+            >
+              Play Again
+            </button>
+
+            <button
+              className="exit-btn"
+              onClick={() => sendVote("exit")}
+            >
+              Exit
+            </button>
+          </div>
+        ) : (
+          <p className="waiting-text">
+            Waiting for other players…
+          </p>
+        )}
+      </div>
 
       {/* ================= VOTES ================= */}
       <div className="rematch-votes">
@@ -102,7 +154,9 @@ export default function RematchScreen() {
             </span>
             <span
               className={
-                decision === "play" ? "vote-play" : "vote-exit"
+                decision === "play"
+                  ? "vote-play"
+                  : "vote-exit"
               }
             >
               {decision}
@@ -110,6 +164,7 @@ export default function RematchScreen() {
           </div>
         ))}
       </div>
+
     </div>
   );
 }
