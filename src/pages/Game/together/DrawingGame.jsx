@@ -225,8 +225,6 @@ export default function DrawingGame({ boardImage }) {
               ? "You can draw only on the LEFT side."
               : "You can draw only on the RIGHT side."}
           </li>
-          <li>Work together to complete the drawing.</li>
-          <li>Your drawing is synced live.</li>
         </ul>
       </div>
 
