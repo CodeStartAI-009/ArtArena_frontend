@@ -591,6 +591,20 @@
   align-items: center;
   z-index: 9999;
 }
+.together-word-box {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.together-word {
+  font-size: 22px;
+  font-weight: bold;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: inline-block;
+}
 
 /* ===============================
    MOBILE

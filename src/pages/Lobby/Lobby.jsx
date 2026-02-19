@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getSocket } from "../../socket/socket";
 import { useAuth } from "../../context/AuthContext";
 import themes from "../Home/themes";
+import RoomCodeModal from "./RoomCodeModal";
 
 export default function Lobby() {
   const { code } = useParams();
@@ -13,6 +14,7 @@ export default function Lobby() {
 
   const [room, setRoom] = useState(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [showCodeModal, setShowCodeModal] = useState(false);
 
   const joinedRef = useRef(false);
   const navigatedRef = useRef(false);
@@ -24,10 +26,10 @@ export default function Lobby() {
   const isHost =
     String(room?.hostId) === String(user?._id);
 
-  const isPublic = room?.mode === "Public";
+  const isPublic = room?.type === "public";
 
   const canStart =
-    !isPublic && // host start only for private rooms
+    !isPublic &&
     isHost &&
     players.length >= 2 &&
     room?.status === "lobby";
@@ -44,47 +46,20 @@ export default function Lobby() {
     setIsTouchDevice(touch);
   }, []);
 
-  /* ================= BOTTOM BANNER AD ================= */
-  useEffect(() => {
-    const container = document.getElementById("lobby-bottom-ad");
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    const key = "0b79b01c3ecc8c76d45be1df8477b24f";
-
-    const isMobile = window.innerWidth <= 768;
-    const width = isMobile ? 320 : 728;
-    const height = isMobile ? 50 : 90;
-
-    const timer = setTimeout(() => {
-      window.atOptions = {
-        key,
-        format: "iframe",
-        height,
-        width,
-        params: {}
-      };
-
-      const script = document.createElement("script");
-      script.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
-      script.async = true;
-
-      container.appendChild(script);
-    }, 200);
-
-    return () => {
-      clearTimeout(timer);
-      container.innerHTML = "";
-    };
-  }, []);
-
   /* ================= SOCKET ================= */
   useEffect(() => {
     if (!authReady || !user) return;
 
     const handleLobbyUpdate = (roomState) => {
       setRoom(roomState);
+
+      // 🔥 Show code modal only for private rooms (once)
+      if (
+        roomState.type === "private" &&
+        !showCodeModal
+      ) {
+        setShowCodeModal(true);
+      }
 
       if (
         roomState.status === "playing" &&
@@ -121,7 +96,7 @@ export default function Lobby() {
       socket.off("GAME_STARTED", handleGameStarted);
       socket.off("connect", joinLobby);
     };
-  }, [authReady, user, socket, code, navigate]);
+  }, [authReady, user, socket, code, navigate, showCodeModal]);
 
   /* ================= DESKTOP START (SPACE) ================= */
   useEffect(() => {
@@ -155,14 +130,13 @@ export default function Lobby() {
 
   /* ================= FOOTER MESSAGE ================= */
   const footerMessage =
-  isPublic
-    ? "Waiting for players..."
-    : isHost && players.length >= 2
-      ? isTouchDevice
-        ? "Tap anywhere to start"
-        : "Press SPACE to start the game"
-      : "Waiting for players...";
-
+    isPublic
+      ? "Waiting for players..."
+      : isHost && players.length >= 2
+        ? isTouchDevice
+          ? "Tap anywhere to start"
+          : "Press SPACE to start the game"
+        : "Waiting for players...";
 
   /* ================= UI ================= */
   return (
@@ -176,11 +150,15 @@ export default function Lobby() {
           canStart && isTouchDevice ? "pointer" : "default",
       }}
     >
-      {/* ================= BOTTOM AD ================= */}
-      <div className="lobby-bottom-ad">
-        <div id="lobby-bottom-ad"></div>
-      </div>
+      {/* 🔥 ROOM CODE MODAL */}
+      {showCodeModal && room?.type === "private" && (
+        <RoomCodeModal
+          code={room.code}
+          onClose={() => setShowCodeModal(false)}
+        />
+      )}
 
+      {/* ================= TITLE ================= */}
       <div className="lobby-title">
         <span className="title-left">
           {theme.name} Arena
@@ -190,6 +168,7 @@ export default function Lobby() {
         </span>
       </div>
 
+      {/* ================= PLAYERS ================= */}
       <div className="players-panel">
         <h3>
           Players ({players.length}/{maxPlayers})
@@ -208,6 +187,7 @@ export default function Lobby() {
         ))}
       </div>
 
+      {/* ================= FOOTER ================= */}
       <div className="lobby-footer">
         {footerMessage}
       </div>

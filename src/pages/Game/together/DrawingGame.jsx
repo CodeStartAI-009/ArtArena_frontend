@@ -16,6 +16,8 @@ export default function DrawingGame({ boardImage }) {
   const { game } = useGameStore();
   const roomCode = game?.code;
 
+  const word = game?.currentWord;
+
   /* ================= SAFE FLAGS ================= */
   const isReady =
     !!game &&
@@ -65,11 +67,6 @@ export default function DrawingGame({ boardImage }) {
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
 
-      const scaledX = x * width;
-      const scaledY = y * height;
-      const scaledPrevX = prevX * width;
-      const scaledPrevY = prevY * height;
-
       ctx.save();
 
       if (tool === "erase") {
@@ -82,10 +79,9 @@ export default function DrawingGame({ boardImage }) {
       }
 
       ctx.beginPath();
-      ctx.moveTo(scaledPrevX, scaledPrevY);
-      ctx.lineTo(scaledX, scaledY);
+      ctx.moveTo(prevX * width, prevY * height);
+      ctx.lineTo(x * width, y * height);
       ctx.stroke();
-
       ctx.restore();
     };
 
@@ -96,21 +92,12 @@ export default function DrawingGame({ boardImage }) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
 
-    const syncDrawing = (strokes = []) => {
-      clearCanvas();
-      strokes.forEach(drawStroke);
-    };
-
     socket.on("DRAW", drawStroke);
-    socket.on("DRAW_SYNC", syncDrawing);
     socket.on("CLEAR_CANVAS", clearCanvas);
-
-    socket.emit("REQUEST_DRAW_SYNC", { code: roomCode });
 
     return () => {
       window.removeEventListener("resize", setupCanvas);
       socket.off("DRAW", drawStroke);
-      socket.off("DRAW_SYNC", syncDrawing);
       socket.off("CLEAR_CANVAS", clearCanvas);
     };
   }, [roomCode, socket]);
@@ -123,19 +110,15 @@ export default function DrawingGame({ boardImage }) {
     const rect = canvas.getBoundingClientRect();
     const t = e.touches?.[0];
 
-    const rawX = (t ? t.clientX : e.clientX) - rect.left;
-    const rawY = (t ? t.clientY : e.clientY) - rect.top;
-
     return {
-      x: rawX / rect.width,
-      y: rawY / rect.height,
+      x: ((t ? t.clientX : e.clientX) - rect.left) / rect.width,
+      y: ((t ? t.clientY : e.clientY) - rect.top) / rect.height,
     };
   };
 
   /* ================= SIDE LIMIT ================= */
   const canDrawHere = (normalizedX) => {
     if (!isReady) return false;
-
     return isLeftPlayer
       ? normalizedX <= 0.5
       : normalizedX >= 0.5;
@@ -168,11 +151,6 @@ export default function DrawingGame({ boardImage }) {
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
 
-    const scaledX = point.x * width;
-    const scaledY = point.y * height;
-    const scaledPrevX = prev.x * width;
-    const scaledPrevY = prev.y * height;
-
     ctx.save();
 
     if (tool === "erase") {
@@ -185,10 +163,9 @@ export default function DrawingGame({ boardImage }) {
     }
 
     ctx.beginPath();
-    ctx.moveTo(scaledPrevX, scaledPrevY);
-    ctx.lineTo(scaledX, scaledY);
+    ctx.moveTo(prev.x * width, prev.y * height);
+    ctx.lineTo(point.x * width, point.y * height);
     ctx.stroke();
-
     ctx.restore();
 
     socket.emit("DRAW", {
@@ -217,13 +194,20 @@ export default function DrawingGame({ boardImage }) {
   /* ================= RENDER ================= */
   return (
     <>
+      {/* 🔥 WORD DISPLAY */}
+      <div className="together-word-box">
+        <h2>Draw This:</h2>
+        <div className="together-word">
+          {word || "Loading word..."}
+        </div>
+      </div>
+
       <div className="together-instructions">
-        <h3>Together Drawing Mode</h3>
         <ul>
           <li>
             {isLeftPlayer
-              ? "You can draw only on the LEFT side."
-              : "You can draw only on the RIGHT side."}
+              ? "You draw on LEFT side."
+              : "You draw on RIGHT side."}
           </li>
         </ul>
       </div>
@@ -245,14 +229,11 @@ export default function DrawingGame({ boardImage }) {
 
       {tool === "draw" && (
         <div className="color-picker">
-          <label>
-            🎨 Select Color:
-            <input
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-            />
-          </label>
+          <input
+            type="color"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+          />
         </div>
       )}
 
@@ -263,8 +244,6 @@ export default function DrawingGame({ boardImage }) {
             ? `url(${boardImage})`
             : "none",
           backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
         }}
       >
         <canvas

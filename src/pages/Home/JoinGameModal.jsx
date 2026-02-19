@@ -43,7 +43,7 @@ export default function JoinGameModal({ onClose }) {
         />
 
         <button className="join-btn" onClick={handleJoin}>
-          <FaDoorOpen /> {loading ? "Joining..." : "Join Game"}
+          <FaDoorOpen /> {loading ? "Joining..." : "Join Game 5🪙"}
         </button>
       </div>
     </div>

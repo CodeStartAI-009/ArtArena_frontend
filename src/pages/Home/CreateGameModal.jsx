@@ -210,7 +210,7 @@ export default function CreateGameModal({ onClose }) {
           </div>
 
           <button className="play-btn" onClick={handleCreate}>
-            {loading ? "Creating..." : "Create"}
+            {loading ? "Creating..." : "Create 10🪙"}
           </button>
         </div>
       </div>

@@ -79,7 +79,7 @@
   
   /* ================= JOIN BUTTON ================= */
   .join-btn {
-    width: 50%;
+    width: 60%;
     margin: 0 auto; /* ✅ centers horizontally */
     padding: 16px;
     font-size: 20px;
