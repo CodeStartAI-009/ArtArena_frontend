@@ -324,8 +324,11 @@
 /* =========================================================
    WORD CHOICE OVERLAY
 ========================================================= */
+ /* =========================================================
+   OVERLAY
+========================================================= */
 
-.word-choice {
+.word-choice-overlay {
   position: fixed;
   inset: 0;
   z-index: 900;
@@ -334,15 +337,15 @@
   align-items: center;
   justify-content: center;
 
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0,0,0,0.65);
   backdrop-filter: blur(6px);
 }
 
 /* =========================================================
-   MAIN MODAL BOX
+   SINGLE MODAL CONTAINER
 ========================================================= */
 
-.word-choice > div {
+.word-choice-container {
   width: min(92vw, 420px);
 
   background: linear-gradient(
@@ -352,13 +355,13 @@
   );
 
   border-radius: 20px;
-  padding: 24px 22px;
+  padding: 24px;
+
+  color: white;
 
   box-shadow:
     0 25px 60px rgba(0,0,0,0.6),
     inset 0 1px 0 rgba(255,255,255,0.08);
-
-  color: white;
 
   animation: modalPop 0.25s ease;
 }
@@ -375,21 +378,19 @@
 }
 
 /* =========================================================
-   HEADER (TITLE + TIMER)
+   HEADER
 ========================================================= */
 
 .word-choice-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   margin-bottom: 18px;
 }
 
 .word-choice-header h3 {
   font-size: 18px;
   font-weight: 800;
-  letter-spacing: 0.5px;
 }
 
 /* =========================================================
@@ -406,7 +407,6 @@
   background: rgba(255,255,255,0.1);
 }
 
-/* Danger state */
 .word-timer.danger {
   background: linear-gradient(
     180deg,
@@ -470,26 +470,6 @@
 .word-choice-buttons button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width: 600px) {
-  .word-choice > div {
-    width: 94vw;
-    padding: 20px;
-  }
-
-  .word-choice-header h3 {
-    font-size: 16px;
-  }
-
-  .word-choice-buttons button {
-    font-size: 14px;
-    padding: 10px;
-  }
 }
 /* =========================================================
    REMATCH SCREEN

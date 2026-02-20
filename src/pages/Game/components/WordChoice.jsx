@@ -69,25 +69,31 @@ export default function WordChoice({ roomCode }) {
   if (!wordChoices?.length) return null;
 
   return (
-    <div className="word-choice">
-      <div className="word-choice-header">
-        <h3>Choose a word</h3>
-        <span className={`word-timer ${timeLeft <= 3 ? "danger" : ""}`}>
-          ⏱ {timeLeft}s
-        </span>
+     
+      <div className="word-choice-overlay">
+        <div className="word-choice-container">
+    
+          <div className="word-choice-header">
+            <h3>Choose a word</h3>
+            <span className={`word-timer ${timeLeft <= 3 ? "danger" : ""}`}>
+              ⏱ {timeLeft}s
+            </span>
+          </div>
+    
+          <div className="word-choice-buttons">
+            {wordChoices.map(word => (
+              <button
+                key={word}
+                onClick={() => selectWord(word)}
+                disabled={timeLeft <= 0}
+              >
+                {word}
+              </button>
+            ))}
+          </div>
+    
+        </div>
       </div>
-
-      <div className="word-choice-buttons">
-        {wordChoices.map(word => (
-          <button
-            key={word}
-            onClick={() => selectWord(word)}
-            disabled={timeLeft <= 0}
-          >
-            {word}
-          </button>
-        ))}
-      </div>
-    </div>
+    
   );
 }
