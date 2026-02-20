@@ -321,33 +321,111 @@
 .word-letter.revealed {
   border-bottom: 3px solid var(--success);
 }
-
 /* =========================================================
-   WORD CHOICE MODAL
+   WORD CHOICE OVERLAY
 ========================================================= */
 
 .word-choice {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 900;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
 }
+
+/* =========================================================
+   MAIN MODAL BOX
+========================================================= */
 
 .word-choice > div {
-  width: min(90vw, 480px);
-  padding: 28px;
+  width: min(92vw, 420px);
 
-  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    180deg,
+    #1e293b,
+    #0f172a
+  );
 
-  background: var(--bg-dark);
-  box-shadow: var(--shadow-deep);
+  border-radius: 20px;
+  padding: 24px 22px;
+
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+
+  color: white;
+
+  animation: modalPop 0.25s ease;
 }
+
+@keyframes modalPop {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   HEADER (TITLE + TIMER)
+========================================================= */
+
+.word-choice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 18px;
+}
+
+.word-choice-header h3 {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+/* =========================================================
+   TIMER
+========================================================= */
+
+.word-timer {
+  padding: 6px 12px;
+  border-radius: 999px;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  background: rgba(255,255,255,0.1);
+}
+
+/* Danger state */
+.word-timer.danger {
+  background: linear-gradient(
+    180deg,
+    #ef4444,
+    #dc2626
+  );
+
+  animation: timerPulse 0.8s infinite ease-in-out;
+}
+
+@keyframes timerPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* =========================================================
+   WORD BUTTONS
+========================================================= */
 
 .word-choice-buttons {
   display: flex;
@@ -357,16 +435,62 @@
 
 .word-choice-buttons button {
   padding: 12px;
-  border-radius: var(--radius-md);
+
+  border-radius: 14px;
   border: none;
 
+  font-size: 15px;
   font-weight: 700;
+
   cursor: pointer;
 
-  background: linear-gradient(180deg, var(--primary), var(--primary-dark));
-  color: white;
+  background: linear-gradient(
+    180deg,
+    #3b82f6,
+    #1e40af
+  );
+
+  color: #ffffff;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.25),
+    0 8px 20px rgba(0,0,0,0.4);
+
+  transition: all 0.2s ease;
 }
 
+.word-choice-buttons button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.word-choice-buttons button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.word-choice-buttons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .word-choice > div {
+    width: 94vw;
+    padding: 20px;
+  }
+
+  .word-choice-header h3 {
+    font-size: 16px;
+  }
+
+  .word-choice-buttons button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
 /* =========================================================
    REMATCH SCREEN
 ========================================================= */
