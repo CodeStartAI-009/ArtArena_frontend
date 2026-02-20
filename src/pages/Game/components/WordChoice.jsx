@@ -69,7 +69,6 @@ export default function WordChoice({ roomCode }) {
   if (!wordChoices?.length) return null;
 
   return (
-     
       <div className="word-choice-overlay">
         <div className="word-choice-container">
     
