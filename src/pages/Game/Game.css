@@ -1,6 +1,28 @@
-/* ===============================
+/* =========================================================
+   DESIGN TOKENS
+========================================================= */
+
+:root {
+  --primary: #3b82f6;
+  --primary-dark: #1e40af;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warning: #facc15;
+
+  --bg-dark: #0f172a;
+  --glass: rgba(15, 23, 42, 0.75);
+
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-pill: 999px;
+
+  --shadow-soft: 0 10px 30px rgba(0,0,0,0.4);
+  --shadow-deep: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+/* =========================================================
    ROOT GAME WRAPPER
-================================ */
+========================================================= */
 
 .game-root {
   width: 100vw;
@@ -13,32 +35,23 @@
   flex-direction: column;
   align-items: center;
 
-  color: #ffffff;
   font-family: "Inter", system-ui, sans-serif;
+  color: white;
+
   overflow: hidden;
   position: relative;
 }
 
-/* ===============================
-   BACKGROUND OVERLAY
-================================ */
-
 .game-overlay {
   position: absolute;
   inset: 0;
-  z-index: 0;
-
   background: radial-gradient(
     ellipse at center,
-    rgba(0, 0, 0, 0.15) 0%,
-    rgba(0, 0, 0, 0.55) 70%,
-    rgba(0, 0, 0, 0.85) 100%
+    rgba(0,0,0,0.2),
+    rgba(0,0,0,0.75)
   );
+  z-index: 0;
 }
-
-/* ===============================
-   GAME CONTENT
-================================ */
 
 .game-screen {
   position: relative;
@@ -50,17 +63,16 @@
   flex-direction: column;
   align-items: center;
 
-  /* ✅ SPACE FOR TOP BAR */
   padding-top: 90px;
 }
 
-/* ===============================
+/* =========================================================
    TOP BAR
-================================ */
+========================================================= */
 
 .top-bar {
   position: absolute;
-  top: 16px;
+  top: 18px;
   left: 50%;
   transform: translateX(-50%);
 
@@ -70,665 +82,606 @@
   gap: 24px;
 
   min-width: 420px;
-  padding: 10px 24px;
-  border-radius: 999px;
+  padding: 10px 28px;
 
-  font-size: 16px;
+  border-radius: var(--radius-pill);
+
+  background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+
   font-weight: 800;
   letter-spacing: 0.6px;
   text-transform: uppercase;
 
-  background: linear-gradient(180deg, #3b82f6, #1e40af);
-  box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.25),
-    0 8px 20px rgba(0,0,0,0.45);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(8px);
 
-  z-index: 6;
+  z-index: 20;
 }
 
-.top-bar-left { white-space: nowrap; }
-.top-bar-center { flex: 1; display: flex; justify-content: center; }
-.top-bar-right { white-space: nowrap; }
+/* =========================================================
+   CANVAS
+========================================================= */
 
-/* ===============================
+.canvas-wrapper {
+  position: relative;
+
+  width: min(80vw, 750px);
+  aspect-ratio: 1000 / 500;
+
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+
+  background: white;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.5),
+    var(--shadow-deep);
+
+  transition: transform 0.2s ease;
+}
+
+@media (hover: hover) {
+  .canvas-wrapper:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.drawing-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* Split mode divider */
+.canvas-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+
+  background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+  transform: translateX(-50%);
+
+  box-shadow: 0 0 12px rgba(59,130,246,0.8);
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.tool-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+
+  box-shadow: var(--shadow-soft);
+}
+
+.tool-bar button {
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  border: none;
+
+  font-weight: 700;
+  font-size: 14px;
+
+  cursor: pointer;
+
+  background: rgba(255,255,255,0.1);
+  color: white;
+
+  transition: all 0.2s ease;
+}
+
+.tool-bar button:hover {
+  background: var(--primary);
+}
+
+.tool-bar button.active {
+  background: linear-gradient(180deg, var(--success), #16a34a);
+  color: black;
+}
+
+/* =========================================================
+   COLOR PICKER
+========================================================= */
+
+.color-picker {
+  margin-bottom: 14px;
+
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+
+  box-shadow: var(--shadow-soft);
+}
+
+.color-picker input[type="color"] {
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* =========================================================
+   GUESS INPUT
+========================================================= */
+
+.guess-input {
+  width: min(90vw, 460px);
+  margin-top: 20px;
+
+  padding: 14px 18px;
+
+  border-radius: var(--radius-md);
+  border: none;
+
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+
+  background: white;
+  color: #111827;
+
+  box-shadow: var(--shadow-soft);
+  transition: 0.2s ease;
+}
+
+.guess-input:focus {
+  outline: none;
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 3px rgba(59,130,246,0.5),
+    var(--shadow-soft);
+}
+
+.guess-input:disabled {
+  background: #e5e7eb;
+  cursor: not-allowed;
+}
+
+/* =========================================================
    PLAYER LIST
-================================ */
+========================================================= */
 
 .player-list {
   position: absolute;
-  left: 12px;
-  top: 84px;
+  left: 16px;
+  top: 100px;
 
-  width: 200px;
+  width: 220px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .player-card {
-  background: rgba(0,0,0,0.6);
-  border-radius: 14px;
-  padding: 10px 14px;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  font-weight: 800;
-  backdrop-filter: blur(6px);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+
+  font-weight: 700;
+  box-shadow: var(--shadow-soft);
 }
 
-.player-card span:last-child {
-  background: #ffd166;
-  color: #000;
-  padding: 4px 10px;
-  border-radius: 10px;
+.player-card.drawer {
+  border: 2px solid var(--warning);
 }
 
-/* ===============================
+.player-card.correct {
+  background: linear-gradient(90deg, var(--success), #16a34a);
+  color: black;
+}
+
+.player-card.disconnected {
+  opacity: 0.5;
+}
+
+/* =========================================================
    WORD MASK
-================================ */
+========================================================= */
 
 .word-mask {
   display: flex;
-  justify-content: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .word-letter {
-  font-size: 26px;
-  font-weight: 700;
   width: 26px;
-  text-align: center;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 900;
   border-bottom: 3px solid rgba(255,255,255,0.6);
 }
-.together-instructions {
-  margin-bottom: 12px;
-  padding: 12px 16px;
 
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(6px);
-
-  border-radius: 12px;
-  color: #e5e7eb;
-
-  font-size: 14px;
-  max-width: 520px;
-  text-align: center;
+.word-letter.revealed {
+  border-bottom: 3px solid var(--success);
 }
 
-.together-instructions h3 {
-  margin: 0 0 6px;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.together-instructions ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.together-instructions li {
-  margin: 4px 0;
-}
-/* =========================
-   COLOR PICKER (FIXED)
-========================= */
-
-.color-picker {
-  position: relative;
-  z-index: 5;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  margin: 12px 0 16px;
-  padding: 8px 12px;
-
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
-  user-select: none;
-  pointer-events: auto;
-}
-
-.color-picker label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-}
-
-.color-picker input[type="color"] {
-  -webkit-appearance: none;
-  appearance: none;
-
-  width: 36px;
-  height: 36px;
-  padding: 0;
-
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-
-  cursor: pointer;
-}
-
-/* Chrome / Edge */
-.color-picker input[type="color"]::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-
-.color-picker input[type="color"]::-webkit-color-swatch {
-  border-radius: 8px;
-  border: 2px solid #ddd;
-}
-
-/* Firefox */
-.color-picker input[type="color"]::-moz-color-swatch {
-  border-radius: 8px;
-  border: 2px solid #ddd;
-}
-
-/* Hover / focus */
-.color-picker input[type="color"]:hover,
-.color-picker input[type="color"]:focus {
-  transform: scale(1.05);
-}
-
-.color-picker input[type="color"]:focus-visible {
-  outline: 2px solid #4a90e2;
-  outline-offset: 2px;
-}
-
-/* ===============================
-   CANVAS (SAFE)
-================================ */
-
-.canvas-wrapper {
-  z-index: 3;
-}
-
-.drawing-canvas {
-  touch-action: none;
-}
-.tool-bar {
-  position: relative;
-  z-index: 5;
-
-  display: flex;
-  gap: 10px;
-  margin-bottom: 8px;
-
-  pointer-events: auto;
-}
-
-.tool-bar button {
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-weight: 700;
-  cursor: pointer;
-
-  background: #1e293b;
-  color: #fff;
-  border: none;
-}
-
-.tool-bar button.active {
-  background: #22c55e;
-  color: #000;
-}
-
-/* ===============================
-   CANVAS
-================================ */
-
-.canvas-wrapper {
-  z-index: 3;
-
-  width: min(90vw, 800px);
-  aspect-ratio: 800 / 420;
-  height: auto;
-  border-radius: 18px;
-  overflow: hidden;
-
-  /* ✅ CLEAN GAP BELOW TOP BAR */
-  margin-top: 24px;
-
-  box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.25),
-    0 18px 40px rgba(0,0,0,0.55);
-}
-
-/* ===============================
-   GUESS INPUT
-================================ */
-
-.guess-input {
-  margin-top: 18px;
-  width: 420px;
-  padding: 14px 18px;
-  border-radius: 16px;
-  border: none;
-
-  font-size: 18px;
-  font-weight: 700;
-  text-align: center;
-}
-
-/* =====================================================
-   WORD CHOICE POPUP
-===================================================== */
+/* =========================================================
+   WORD CHOICE MODAL
+========================================================= */
 
 .word-choice {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: 9999;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
 }
 
-.word-choice > * {
-  background: linear-gradient(
-    180deg,
-    rgba(30, 41, 59, 0.95),
-    rgba(15, 23, 42, 0.95)
-  );
+.word-choice > div {
+  width: min(90vw, 480px);
+  padding: 28px;
 
-  padding: 22px 26px;
-  border-radius: 18px;
-  min-width: 320px;
+  border-radius: var(--radius-lg);
 
-  box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.15),
-    0 24px 60px rgba(0,0,0,0.7);
+  background: var(--bg-dark);
+  box-shadow: var(--shadow-deep);
 }
 
-/* ===============================
-   START GUESSING BUTTON
-================================ */
+.word-choice-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.word-choice-buttons button {
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: none;
+
+  font-weight: 700;
+  cursor: pointer;
+
+  background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+  color: white;
+}
+
+/* =========================================================
+   REMATCH SCREEN
+========================================================= */
+/* =========================================================
+   ALLOW GUESSING BUTTON
+========================================================= */
 
 .start-guessing-btn {
   margin-top: 16px;
-  padding: 12px 26px;
-  border-radius: 999px;
-  font-size: 16px;
-  font-weight: 900;
+  padding: 12px 28px;
 
-  background: linear-gradient(180deg, #22c55e, #16a34a);
+  border: none;
+  border-radius: 999px;
+
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+
   cursor: pointer;
+
+  background: linear-gradient(180deg, #3b82f6, #1e40af);
+  color: #ffffff;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.25),
+    0 12px 30px rgba(0,0,0,0.45);
+
+  transition: all 0.2s ease;
+}
+
+/* Hover */
+.start-guessing-btn:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.35),
+    0 18px 40px rgba(0,0,0,0.55);
+}
+
+/* Active */
+.start-guessing-btn:active {
+  transform: scale(0.96);
+}
+
+/* Optional Pulse */
+.start-guessing-btn.pulse {
+  animation: guessingPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes guessingPulse {
+  0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.6); }
+  70% { box-shadow: 0 0 0 14px rgba(59,130,246,0); }
+  100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
 }
 /* =========================================================
-   SMALL BOTTOM LEFT AD
+   REMATCH SCREEN ROOT
 ========================================================= */
-.classic-bottom-ad {
-  position: fixed;
-  bottom: 10px;
-  left: 10px;
-  width: 320px;
-  height: 50px;
-  z-index: 9999;
-}
+/* =========================================================
+   REMATCH SCREEN ROOT (BRIGHT ARCADE STYLE)
+========================================================= */
 
-@media (max-width: 480px) {
-  .classic-bottom-ad {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-}
-
-.game-bottom-ad {
-  position: fixed;
-  bottom: 10px;
-  left: 10px;
-  width: 320px;
-  height: 50px;
-  z-index: 10;
-}
-
-/* Center on very small screens */
-@media (max-width: 480px) {
-  .game-bottom-ad {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-}
-/* =========================
-   ROOT CONTAINER
-========================= */
 .rematch-screen {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
-  color: #ffffff;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px;
-  font-family: "Poppins", sans-serif;
+
+  padding: 40px 16px;
+
+  background: linear-gradient(
+    180deg,
+    #8ec5ff 0%,
+    #6aa9f7 40%,
+    #3b82f6 100%
+  );
+
+  font-family: "Inter", system-ui, sans-serif;
 }
 
-/* =========================
-   HEADINGS
-========================= */
+/* =========================================================
+   GAME OVER HEADER BAR (BLUE PILL STYLE)
+========================================================= */
+
 .rematch-screen h2 {
-  font-size: 32px;
+  background: linear-gradient(180deg, #1d4ed8, #1e40af);
+  color: white;
+
+  padding: 12px 28px;
+  border-radius: 16px;
+
+  font-size: 20px;
+  font-weight: 900;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.3),
+    0 6px 15px rgba(0,0,0,0.3);
+
   margin-bottom: 20px;
 }
 
-.rematch-screen h3 {
-  margin: 10px 0;
-}
+/* =========================================================
+   WINNER SECTION (YELLOW CARD)
+========================================================= */
 
-.rematch-screen h4 {
-  margin-bottom: 10px;
-  opacity: 0.9;
-}
-
-/* =========================
-   WINNER SECTION
-========================= */
 .winner-section {
-  background: #2f2f4f;
-  padding: 20px 30px;
-  border-radius: 12px;
-  margin-bottom: 25px;
+  width: 100%;
+  max-width: 420px;
+
+  background: linear-gradient(180deg, #facc15, #f59e0b);
+  color: #000;
+
+  border-radius: 18px;
+  padding: 20px;
+
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  margin-bottom: 18px;
+}
+
+.winner-section h3 {
+  font-size: 18px;
+  font-weight: 900;
 }
 
 .winner-section strong {
-  color: gold;
-  font-size: 20px;
+  font-size: 22px;
 }
 
-/* =========================
-   LEADERBOARD
-========================= */
+/* =========================================================
+   LEADERBOARD PANEL (WHITE CARD LIKE IMAGE)
+========================================================= */
+
 .leaderboard {
   width: 100%;
-  max-width: 500px;
-  background: #26263a;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 30px;
+  max-width: 420px;
+
+  background: #ffffff;
+  border-radius: 20px;
+
+  padding: 16px;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  margin-bottom: 20px;
 }
+
+.leaderboard h4 {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #1e3a8a;
+}
+
+/* =========================================================
+   LEADERBOARD ROWS (BLUE STRIPES LIKE IMAGE)
+========================================================= */
 
 .leaderboard-row {
   display: flex;
   justify-content: space-between;
-  padding: 10px 12px;
+  align-items: center;
+
+  padding: 10px 14px;
   margin-bottom: 8px;
-  border-radius: 8px;
-  background: #333357;
-  transition: 0.2s ease;
+
+  border-radius: 10px;
+
+  background: linear-gradient(
+    180deg,
+    #60a5fa,
+    #3b82f6
+  );
+
+  color: white;
+  font-weight: 700;
+
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
 }
 
-.leaderboard-row:hover {
-  transform: translateY(-2px);
-  background: #3f3f6a;
+.leaderboard-row:last-child {
+  margin-bottom: 0;
 }
+
+/* Winner highlight (orange like top player in image) */
 
 .winner-row {
-  background: linear-gradient(90deg, #d4af37, #f1c40f);
-  color: #000;
-  font-weight: bold;
+  background: linear-gradient(
+    180deg,
+    #fb923c,
+    #f97316
+  );
+
+  color: white;
+  font-weight: 900;
 }
 
-/* =========================
-   REMATCH SECTION
-========================= */
+/* =========================================================
+   REMATCH QUESTION
+========================================================= */
+
 .rematch-section {
+  width: 100%;
+  max-width: 420px;
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
+
+.rematch-section p {
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: white;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
 
 .rematch-buttons {
   display: flex;
-  gap: 20px;
-  margin-top: 15px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.play-again-btn,
-.exit-btn {
-  padding: 12px 22px;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.2s ease;
-  font-weight: 600;
-}
+/* PLAY AGAIN (GREEN BIG BUTTON LIKE IMAGE FOOTER) */
 
-/* Play button */
 .play-again-btn {
-  background: #2ecc71;
-  color: #000;
+  padding: 14px;
+
+  border: none;
+  border-radius: 14px;
+
+  font-size: 16px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  background: linear-gradient(
+    180deg,
+    #22c55e,
+    #16a34a
+  );
+
+  color: white;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.3),
+    0 6px 15px rgba(0,0,0,0.35);
+
+  transition: transform 0.15s ease;
 }
 
-.play-again-btn:hover {
-  background: #27ae60;
-  transform: scale(1.05);
+.play-again-btn:active {
+  transform: scale(0.97);
 }
 
-/* Exit button */
+/* EXIT BUTTON (RED) */
+
 .exit-btn {
-  background: #e74c3c;
-  color: #fff;
+  padding: 12px;
+
+  border: none;
+  border-radius: 14px;
+
+  font-size: 15px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  background: linear-gradient(
+    180deg,
+    #ef4444,
+    #dc2626
+  );
+
+  color: white;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.2),
+    0 6px 15px rgba(0,0,0,0.35);
+
+  transition: transform 0.15s ease;
 }
 
-.exit-btn:hover {
-  background: #c0392b;
-  transform: scale(1.05);
+.exit-btn:active {
+  transform: scale(0.97);
 }
 
-.waiting-text {
-  opacity: 0.8;
-  font-style: italic;
-}
+/* =========================================================
+   VOTES PANEL
+========================================================= */
 
-/* =========================
-   VOTES SECTION
-========================= */
 .rematch-votes {
   width: 100%;
-  max-width: 500px;
-  background: #26263a;
-  padding: 20px;
-  border-radius: 12px;
+  max-width: 420px;
+
+  background: white;
+  border-radius: 16px;
+
+  padding: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }
 
 .vote-row {
   display: flex;
   justify-content: space-between;
-  padding: 8px 12px;
-  margin-bottom: 6px;
-  border-radius: 6px;
-  background: #333357;
-  font-size: 14px;
+  padding: 8px 0;
+  font-weight: 600;
 }
 
 .vote-play {
-  color: #2ecc71;
-  font-weight: 600;
+  color: #16a34a;
 }
 
 .vote-exit {
-  color: #e74c3c;
-  font-weight: 600;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-@media (max-width: 600px) {
-  .rematch-buttons {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .play-again-btn,
-  .exit-btn {
-    width: 100%;
-  }
-}
-.rematch-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-.together-word-box {
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.together-word {
-  font-size: 22px;
-  font-weight: bold;
-  background: rgba(0,0,0,0.7);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  display: inline-block;
-}
-
-/* ===============================
-   MOBILE
-================================ */
- /* =========================================================
-   GAME RESPONSIVE — PORTRAIT ONLY
-   Landscape behaves like desktop
-========================================================= */
-
- /* =========================================================
-   PHONE LANDSCAPE (Height ≤ 500px)
-========================================================= */
- /* =========================================================
-   PHONE LANDSCAPE — FIXED LAYOUT
-========================================================= */
-@media (max-height: 500px) and (orientation: landscape) {
-
-  .game-screen {
-    padding-top: 50px;
-    justify-content: flex-start;
-  }
-
-  /* ---------- TOP BAR ---------- */
-  .top-bar {
-    top: 6px;
-    min-width: 260px;
-    font-size: 12px;
-    padding: 6px 12px;
-    gap: 10px;
-  }
-
-  /* ---------- PLAYER LIST ---------- */
-  .player-list {
-    top: 50px;
-    left: 6px;
-    width: 140px;
-  }
-
-  .player-card {
-    font-size: 11px;
-    padding: 6px 8px;
-  }
-
-  /* ---------- CENTER AREA ---------- */
-  .canvas-wrapper {
-    width: 65vw;
-    max-width: 720px;
-
-    /* maintain aspect ratio */
-    aspect-ratio: 800 / 420;
-
-    height: auto;
-
-    margin-top: 10px;
-  }
-
-  /* ---------- TOOLBAR ---------- */
-  .tool-bar {
-    margin-bottom: 6px;
-    gap: 6px;
-  }
-
-  .tool-bar button {
-    font-size: 12px;
-    padding: 5px 10px;
-  }
-
-  /* ---------- COLOR PICKER ---------- */
-  .color-picker {
-    padding: 6px 8px;
-  }
-
-  .color-picker label {
-    font-size: 12px;
-  }
-
-  .color-picker input[type="color"] {
-    width: 26px;
-    height: 26px;
-  }
-
-  /* ---------- GUESS INPUT ---------- */
-  .guess-input {
-    width: 55vw;
-    font-size: 14px;
-    padding: 10px 12px;
-  }
-
-  /* ---------- WORD MASK ---------- */
-  .word-letter {
-    font-size: 18px;
-    width: 18px;
-  }
-
-  /* ---------- BUTTON ---------- */
-  .start-guessing-btn {
-    font-size: 13px;
-    padding: 8px 16px;
-  }
-}
-/* =========================================================
-   VERY SMALL LANDSCAPE
-========================================================= */
-@media (max-height: 380px) and (orientation: landscape) {
-
-  .canvas-wrapper {
-    width: 60vw;
-    aspect-ratio: 800 / 420;
-  }
-
-  .guess-input {
-    font-size: 13px;
-  }
-
-  .player-list {
-    width: 120px;
-  }
-
-  .player-card {
-    font-size: 10px;
-  }
-
-  .word-letter {
-    font-size: 16px;
-    width: 16px;
-  }
+  color: #dc2626;
 }
