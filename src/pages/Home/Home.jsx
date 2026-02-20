@@ -94,17 +94,7 @@ export default function Home() {
   
   
 /* ================= MONETAG VIGNETTE ================= */
-useEffect(() => {
-  if (document.getElementById("monetag-vignette")) return;
 
-  const script = document.createElement("script");
-  script.id = "monetag-vignette";
-  script.dataset.zone = "10599539";
-  script.src = "https://gizokraijaw.net/vignette.min.js";
-  script.async = true;
-
-  document.head.appendChild(script);
-}, []);
 
   /* ================= SOCKET ================= */
   useEffect(() => {
