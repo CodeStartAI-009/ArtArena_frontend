@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { getSocket } from "../../../socket/socket";
 import useGameStore from "../store/store";
 
@@ -12,6 +12,21 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
 
   const socket = getSocket();
   const { isDrawer } = useGameStore();
+
+  /* =========================
+     DYNAMIC PEN COLOR
+     White for space theme
+  ========================== */
+  
+    const penColor = useMemo(() => {
+      if (!boardImage) return "#000000";
+    
+      const lower = boardImage.toLowerCase();
+    
+      return lower.includes("spaceboard") || lower.includes("lavaboard")
+        ? "#ffffff"
+        : "#000000";
+    }, [boardImage]);
 
   /* =========================
      CANVAS SETUP (RETINA SAFE)
@@ -67,7 +82,7 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
       } else {
         ctx.globalCompositeOperation = "source-over";
         ctx.lineWidth = 4;
-        ctx.strokeStyle = "#000";
+        ctx.strokeStyle = penColor;
       }
 
       ctx.beginPath();
@@ -103,7 +118,7 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
       socket.off("DRAW_SYNC", syncDrawing);
       socket.off("CLEAR_CANVAS", clearCanvas);
     };
-  }, [socket, roomCode]);
+  }, [socket, roomCode, penColor]);
 
   /* =========================
      GET NORMALIZED POINT
@@ -162,7 +177,7 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
     } else {
       ctx.globalCompositeOperation = "source-over";
       ctx.lineWidth = 4;
-      ctx.strokeStyle = "#000";
+      ctx.strokeStyle = penColor;
     }
 
     ctx.beginPath();
@@ -235,4 +250,3 @@ export default function DrawingCanvas({ roomCode, boardImage }) {
     </>
   );
 }
-

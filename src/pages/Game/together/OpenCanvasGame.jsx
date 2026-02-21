@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { getSocket } from "../../../socket/socket";
 import useGameStore from "../store/store";
 import "../Game.css";
@@ -9,12 +9,30 @@ export default function OpenCanvasGame({ boardImage }) {
   const lastPointRef = useRef(null);
   const isDrawingRef = useRef(false);
 
-  const [color, setColor] = useState("#000000");
-  const [tool, setTool] = useState("draw");
-
   const socket = getSocket();
   const { game } = useGameStore();
   const roomCode = game?.code;
+
+  /* ================= THEME DETECTION ================= */
+  const isDarkTheme = useMemo(() => {
+    if (!boardImage) return false;
+    const lower = boardImage.toLowerCase();
+    return (
+      lower.includes("spaceboard") ||
+      lower.includes("lavaboard")
+    );
+  }, [boardImage]);
+
+  /* ================= COLOR STATE ================= */
+  const [color, setColor] = useState(
+    isDarkTheme ? "#ffffff" : "#000000"
+  );
+  const [tool, setTool] = useState("draw");
+
+  // Auto adjust default color when theme changes
+  useEffect(() => {
+    setColor(isDarkTheme ? "#ffffff" : "#000000");
+  }, [isDarkTheme]);
 
   /* ================= CANVAS SETUP ================= */
   const setupCanvas = () => {
@@ -67,7 +85,7 @@ export default function OpenCanvasGame({ boardImage }) {
         ctx.lineWidth = 24;
       } else {
         ctx.globalCompositeOperation = "source-over";
-        ctx.strokeStyle = color || "#000";
+        ctx.strokeStyle = color || (isDarkTheme ? "#ffffff" : "#000000");
         ctx.lineWidth = 3;
       }
 
@@ -94,7 +112,7 @@ export default function OpenCanvasGame({ boardImage }) {
       socket.off("DRAW", drawStroke);
       socket.off("CLEAR_CANVAS", clearCanvas);
     };
-  }, [socket, roomCode]);
+  }, [socket, roomCode, isDarkTheme]);
 
   /* ================= NORMALIZED POINT ================= */
   const getPoint = (e) => {

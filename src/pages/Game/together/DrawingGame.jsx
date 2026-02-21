@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { getSocket } from "../../../socket/socket";
 import useGameStore from "../store/store";
 import "../Game.css";
@@ -9,14 +9,31 @@ export default function DrawingGame({ boardImage }) {
   const lastPointRef = useRef(null);
   const isDrawingRef = useRef(false);
 
-  const [color, setColor] = useState("#000000");
-  const [tool, setTool] = useState("draw");
-
   const socket = getSocket();
   const { game } = useGameStore();
   const roomCode = game?.code;
-
   const word = game?.currentWord;
+
+  /* ================= THEME DETECTION ================= */
+  const isDarkTheme = useMemo(() => {
+    if (!boardImage) return false;
+    const lower = boardImage.toLowerCase();
+    return (
+      lower.includes("spaceboard") ||
+      lower.includes("lavaboard")
+    );
+  }, [boardImage]);
+
+  /* ================= COLOR STATE ================= */
+  const [color, setColor] = useState(
+    isDarkTheme ? "#ffffff" : "#000000"
+  );
+  const [tool, setTool] = useState("draw");
+
+  // Auto-adjust color if theme changes
+  useEffect(() => {
+    setColor(isDarkTheme ? "#ffffff" : "#000000");
+  }, [isDarkTheme]);
 
   /* ================= SAFE FLAGS ================= */
   const isReady =
@@ -52,7 +69,7 @@ export default function DrawingGame({ boardImage }) {
     ctxRef.current = ctx;
   };
 
-  /* ================= SOCKET + SYNC ================= */
+  /* ================= SOCKET ================= */
   useEffect(() => {
     if (!roomCode) return;
 
@@ -74,7 +91,7 @@ export default function DrawingGame({ boardImage }) {
         ctx.lineWidth = 24;
       } else {
         ctx.globalCompositeOperation = "source-over";
-        ctx.strokeStyle = color || "#000";
+        ctx.strokeStyle = color || (isDarkTheme ? "#fff" : "#000");
         ctx.lineWidth = 3;
       }
 
@@ -100,7 +117,7 @@ export default function DrawingGame({ boardImage }) {
       socket.off("DRAW", drawStroke);
       socket.off("CLEAR_CANVAS", clearCanvas);
     };
-  }, [roomCode, socket]);
+  }, [roomCode, socket, isDarkTheme]);
 
   /* ================= NORMALIZED POINT ================= */
   const getPoint = (e) => {
@@ -194,7 +211,6 @@ export default function DrawingGame({ boardImage }) {
   /* ================= RENDER ================= */
   return (
     <>
-      {/* 🔥 WORD DISPLAY */}
       <div className="together-word-box">
         <h2>Draw This:</h2>
         <div className="together-word">
