@@ -3,7 +3,7 @@ import { FaTimes, FaCopy } from "react-icons/fa";
 
 export default function RoomCodeModal({ code, onClose }) {
   const copy = () => {
-    const link = `${window.location.origin}/?room=${code}`;
+    const link = `${window.location.origin}/join/${code}`;
     const text = `🎨 Join my Art Arena room!\n\nClick here: ${link}\n\nRoom Code: ${code}`;
     navigator.clipboard.writeText(text);
   };
