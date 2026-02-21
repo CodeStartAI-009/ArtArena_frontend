@@ -4,8 +4,8 @@ import { FaTimes, FaDoorOpen } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { joinRoom } from "../../api/room.api";
 
-export default function JoinGameModal({ onClose }) {
-  const [roomId, setRoomId] = useState("");
+export default function JoinGameModal({ onClose,defaultRoomId = ""  }) {
+  const [roomId, setRoomId] =  useState(defaultRoomId);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 

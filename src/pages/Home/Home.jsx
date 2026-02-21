@@ -27,7 +27,7 @@ export default function Home() {
   const { user, setUser, authReady } = useAuth();
   const navigate = useNavigate();
   const socket = getSocket();
-
+  const [autoRoomId, setAutoRoomId] = useState("");
   const [showHowTo, setShowHowTo] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -94,8 +94,16 @@ export default function Home() {
   
   
 /* ================= MONETAG VIGNETTE ================= */
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const room = params.get("room");
 
-
+  if (room) {
+    setAutoRoomId(room.toUpperCase());
+    setShowJoinModal(true);
+    window.history.replaceState({}, document.title, "/");
+  }
+}, []);
   /* ================= SOCKET ================= */
   useEffect(() => {
     const onConnect = () => setSocketReady(true);
@@ -306,7 +314,12 @@ export default function Home() {
 
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       {showCreateModal && <CreateGameModal onClose={() => setShowCreateModal(false)} />}
-      {showJoinModal && <JoinGameModal onClose={() => setShowJoinModal(false)} />}
+      {showJoinModal && (
+  <JoinGameModal
+    defaultRoomId={autoRoomId}
+    onClose={() => setShowJoinModal(false)}
+  />
+)}
     </div>
   );
 }
