@@ -22,7 +22,11 @@ export default function JoinGameModal({ onClose,defaultRoomId = ""  }) {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    if (defaultRoomId) {
+      setRoomId(defaultRoomId);
+    }
+  }, [defaultRoomId]);
   return (
     <div className="join-backdrop">
       <div className="join-modal">

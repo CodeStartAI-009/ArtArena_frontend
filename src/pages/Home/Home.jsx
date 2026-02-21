@@ -6,6 +6,7 @@ import AuthModal from "./AuthModal";
 import CreateGameModal from "./CreateGameModal";
 import JoinGameModal from "./JoinGameModal";
 import { getSocket } from "../../socket/socket";
+import { useParams } from "react-router-dom";
 
 /* ASSETS */
 import companyLogo from "../../assets/logo/company.jpeg";
@@ -33,7 +34,7 @@ export default function Home() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [socketReady, setSocketReady] = useState(socket.connected);
-
+  const { code } = useParams();
   const [showReferral, setShowReferral] = useState(false); // ✅ NEW
 
   const playLockRef = useRef(false);
@@ -58,6 +59,12 @@ export default function Home() {
       document.exitFullscreen().catch(() => {});
     }
   };
+  useEffect(() => {
+    if (!authReady || !user || !code) return;
+  
+    setAutoRoomId(code.toUpperCase());
+    setShowJoinModal(true);
+  }, [authReady, user, code]);
   /* ================= RIGHT SIDE AD ================= */
   useEffect(() => {
     const container = document.getElementById("home-right-ad");

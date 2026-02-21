@@ -66,6 +66,7 @@ export default function App() {
   return (
     <RequireLandscape>
       <Routes>
+      <Route path="/join/:code" element={<Home />} />
         <Route path="/" element={<Home />} />
         <Route path="/lobby/:code" element={<Lobby />} />
         <Route path="/game/:code" element={<Game />} />
