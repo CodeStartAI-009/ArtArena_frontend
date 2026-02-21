@@ -33,7 +33,39 @@ export default function App() {
       sessionStorage.setItem("referralCode", ref);
     }
   }, [location.search]);
-
+  useEffect(() => {
+    const blockKeys = (e) => {
+      // Block F12
+      if (e.key === "F12") {
+        e.preventDefault();
+      }
+  
+      // Block Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+U
+      if (
+        e.ctrlKey &&
+        e.shiftKey &&
+        (e.key === "I" || e.key === "J" || e.key === "C")
+      ) {
+        e.preventDefault();
+      }
+  
+      if (e.ctrlKey && e.key === "u") {
+        e.preventDefault();
+      }
+    };
+  
+    const blockRightClick = (e) => {
+      e.preventDefault();
+    };
+  
+    document.addEventListener("keydown", blockKeys);
+    document.addEventListener("contextmenu", blockRightClick);
+  
+    return () => {
+      document.removeEventListener("keydown", blockKeys);
+      document.removeEventListener("contextmenu", blockRightClick);
+    };
+  }, []);
   /* ======================================================
      2️⃣ WAKE BACKEND (RENDER COLD START FIX)
      - Only runs once on initial load
