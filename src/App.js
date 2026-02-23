@@ -16,7 +16,7 @@ import RequireLandscape from "./RequireLandscape";
 import { useAuth } from "./context/AuthContext";
 import useAutoAuth from "./hooks/useAutoAuth";
 
-const API_URL ="https://artarena-backend.onrender.com";
+const API_URL = "https://artarena-backend.onrender.com";
 
 export default function App() {
   const { authReady } = useAuth();
@@ -33,14 +33,14 @@ export default function App() {
       sessionStorage.setItem("referralCode", ref);
     }
   }, [location.search]);
+
+  /* ======================================================
+     2️⃣ BLOCK DEVTOOLS / RIGHT CLICK (BASIC PROTECTION)
+  ====================================================== */
   useEffect(() => {
     const blockKeys = (e) => {
-      // Block F12
-      if (e.key === "F12") {
-        e.preventDefault();
-      }
-  
-      // Block Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+U
+      if (e.key === "F12") e.preventDefault();
+
       if (
         e.ctrlKey &&
         e.shiftKey &&
@@ -48,27 +48,27 @@ export default function App() {
       ) {
         e.preventDefault();
       }
-  
+
       if (e.ctrlKey && e.key === "u") {
         e.preventDefault();
       }
     };
-  
+
     const blockRightClick = (e) => {
       e.preventDefault();
     };
-  
+
     document.addEventListener("keydown", blockKeys);
     document.addEventListener("contextmenu", blockRightClick);
-  
+
     return () => {
       document.removeEventListener("keydown", blockKeys);
       document.removeEventListener("contextmenu", blockRightClick);
     };
   }, []);
+
   /* ======================================================
-     2️⃣ WAKE BACKEND (RENDER COLD START FIX)
-     - Only runs once on initial load
+     3️⃣ WAKE BACKEND (RENDER COLD START FIX)
   ====================================================== */
   useEffect(() => {
     fetch(`${API_URL}/health`)
@@ -81,24 +81,35 @@ export default function App() {
   }, []);
 
   /* ======================================================
-     3️⃣ AUTO AUTH (guest / token restore)
+     4️⃣ AUTO AUTH (guest / token restore)
   ====================================================== */
   useAutoAuth();
 
   /* ======================================================
-     4️⃣ SPLASH WHILE AUTH INITIALIZING
+     5️⃣ GOOGLE ANALYTICS PAGE TRACKING (GA4 SPA)
+  ====================================================== */
+  useEffect(() => {
+    if (window.gtag) {
+      window.gtag("config", "G-TZ1RYHEVYS", {
+        page_path: location.pathname + location.search,
+      });
+    }
+  }, [location]);
+
+  /* ======================================================
+     6️⃣ SPLASH WHILE AUTH INITIALIZING
   ====================================================== */
   if (!authReady) {
     return <Splash />;
   }
 
   /* ======================================================
-     5️⃣ MAIN APP
+     7️⃣ MAIN APP ROUTES
   ====================================================== */
   return (
     <RequireLandscape>
       <Routes>
-      <Route path="/join/:code" element={<Home />} />
+        <Route path="/join/:code" element={<Home />} />
         <Route path="/" element={<Home />} />
         <Route path="/lobby/:code" element={<Lobby />} />
         <Route path="/game/:code" element={<Game />} />
@@ -108,8 +119,7 @@ export default function App() {
         <Route path="/faq" element={<Faq />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
-        <Route path="/s" element={<Splash/>}/>
-        {/* fallback */}
+        <Route path="/s" element={<Splash />} />
         <Route path="*" element={<Home />} />
       </Routes>
     </RequireLandscape>
