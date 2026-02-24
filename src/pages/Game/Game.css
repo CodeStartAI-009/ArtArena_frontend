@@ -826,6 +826,12 @@ html, body {
   margin: 0;
   padding: 0;
 }
+.rematch-countdown {
+  margin: 20px 0;
+  font-size: 22px;
+  font-weight: bold;
+  color: #4caf50;
+}
 .play-again-btn:active {
   transform: scale(0.97);
 }

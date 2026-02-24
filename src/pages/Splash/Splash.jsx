@@ -11,12 +11,12 @@ export default function Splash() {
   useEffect(() => {
     const container = document.getElementById("right-ad-container");
     if (!container) return;
-  
+
     // Clear old content (important for SPA)
     container.innerHTML = "";
-  
+
     const key = "629768cab9ae71c8053dc803e3186ffe";
-  
+
     const loadAd = () => {
       window.atOptions = {
         key,
@@ -25,25 +25,22 @@ export default function Splash() {
         width: 160,
         params: {}
       };
-  
+
       const script = document.createElement("script");
       script.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
       script.async = true;
-  
+
       container.appendChild(script);
     };
-  
+
     const timer = setTimeout(loadAd, 150);
-  
+
     return () => {
       clearTimeout(timer);
       container.innerHTML = "";
     };
-  
-  }, []);
-  
 
-  const handlePlayStoreClick = () => {};
+  }, []);
 
   return (
     <div className="splash-root">
@@ -62,19 +59,6 @@ export default function Splash() {
         />
 
         <div className="splash-buttons">
-          <button
-            type="button"
-            onClick={handlePlayStoreClick}
-            className="store-link-btn"
-            aria-label="Google Play (Coming Soon)"
-          >
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
-              alt="Get it on Google Play"
-              className="store-btn"
-            />
-          </button>
-
           <a
             href="https://discord.gg/5rPSTx7n"
             target="_blank"

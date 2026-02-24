@@ -12,6 +12,7 @@ export default function RematchScreen() {
 
   const [votes, setVotes] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [countdown, setCountdown] = useState(null);
 
   /* ================= SORT PLAYERS BY SCORE ================= */
   const sortedPlayers = useMemo(() => {
@@ -41,7 +42,7 @@ export default function RematchScreen() {
     const onRematchStarted = () => {
       setSubmitted(false);
       setVotes({});
-      // Game state will be updated by GAME_STATE event
+      setCountdown(10); // Start 10 second countdown
     };
 
     socket.on("REMATCH_UPDATE", onRematchUpdate);
@@ -55,11 +56,28 @@ export default function RematchScreen() {
     };
   }, [socket, navigate, reset]);
 
+  /* ================= COUNTDOWN LOGIC ================= */
+  useEffect(() => {
+    if (countdown === null) return;
+
+    if (countdown === 0) {
+      // Countdown finished — let game continue normally
+      setCountdown(null);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
   if (!game) return null;
 
   /* ================= ACTIONS ================= */
   const sendVote = (decision) => {
-    if (submitted) return;
+    if (submitted || countdown !== null) return;
 
     setSubmitted(true);
 
@@ -69,7 +87,6 @@ export default function RematchScreen() {
     });
 
     if (decision === "exit") {
-      // Immediately move exiting player
       reset();
       navigate("/", { replace: true });
     }
@@ -80,6 +97,13 @@ export default function RematchScreen() {
     <div className="rematch-screen">
 
       <h2>🏁 Game Over</h2>
+
+      {/* ================= COUNTDOWN ================= */}
+      {countdown !== null && (
+        <div className="rematch-countdown">
+          <h3>🚀 New Match Begins In {countdown}s</h3>
+        </div>
+      )}
 
       {/* ================= WINNER ================= */}
       <div className="winner-section">
@@ -113,31 +137,33 @@ export default function RematchScreen() {
       </div>
 
       {/* ================= REMATCH QUESTION ================= */}
-      <div className="rematch-section">
-        <p>Do you want to play again?</p>
+      {countdown === null && (
+        <div className="rematch-section">
+          <p>Do you want to play again?</p>
 
-        {!submitted ? (
-          <div className="rematch-buttons">
-            <button
-              className="play-again-btn"
-              onClick={() => sendVote("play")}
-            >
-              Play Again
-            </button>
+          {!submitted ? (
+            <div className="rematch-buttons">
+              <button
+                className="play-again-btn"
+                onClick={() => sendVote("play")}
+              >
+                Play Again
+              </button>
 
-            <button
-              className="exit-btn"
-              onClick={() => sendVote("exit")}
-            >
-              Exit
-            </button>
-          </div>
-        ) : (
-          <p className="waiting-text">
-            Waiting for other players…
-          </p>
-        )}
-      </div>
+              <button
+                className="exit-btn"
+                onClick={() => sendVote("exit")}
+              >
+                Exit
+              </button>
+            </div>
+          ) : (
+            <p className="waiting-text">
+              Waiting for other players…
+            </p>
+          )}
+        </div>
+      )}
 
       {/* ================= VOTES ================= */}
       <div className="rematch-votes">
