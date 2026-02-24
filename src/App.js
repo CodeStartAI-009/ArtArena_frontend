@@ -23,7 +23,7 @@ export default function App() {
   const location = useLocation();
 
   /* ======================================================
-     1️⃣ CAPTURE REFERRAL CODE (RUN FIRST)
+     1️⃣ CAPTURE REFERRAL CODE
   ====================================================== */
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -35,7 +35,7 @@ export default function App() {
   }, [location.search]);
 
   /* ======================================================
-     2️⃣ BLOCK DEVTOOLS / RIGHT CLICK (BASIC PROTECTION)
+     2️⃣ BASIC DEVTOOLS BLOCK (UI LEVEL ONLY)
   ====================================================== */
   useEffect(() => {
     const blockKeys = (e) => {
@@ -72,26 +72,24 @@ export default function App() {
   ====================================================== */
   useEffect(() => {
     fetch(`${API_URL}/health`)
-      .then(() => {
-        console.log("Backend ready");
-      })
-      .catch(() => {
-        console.log("Backend waking up...");
-      });
+      .then(() => console.log("Backend ready"))
+      .catch(() => console.log("Backend waking up..."));
   }, []);
 
   /* ======================================================
-     4️⃣ AUTO AUTH (guest / token restore)
+     4️⃣ AUTO AUTH
   ====================================================== */
   useAutoAuth();
 
   /* ======================================================
-     5️⃣ GOOGLE ANALYTICS PAGE TRACKING (GA4 SPA)
+     5️⃣ GOOGLE ANALYTICS PAGE TRACKING (SPA SAFE)
   ====================================================== */
   useEffect(() => {
     if (window.gtag) {
-      window.gtag("config", "G-TZ1RYHEVYS", {
+      window.gtag("event", "page_view", {
         page_path: location.pathname + location.search,
+        page_location: window.location.href,
+        page_title: document.title,
       });
     }
   }, [location]);
@@ -104,7 +102,7 @@ export default function App() {
   }
 
   /* ======================================================
-     7️⃣ MAIN APP ROUTES
+     7️⃣ MAIN ROUTES
   ====================================================== */
   return (
     <RequireLandscape>
