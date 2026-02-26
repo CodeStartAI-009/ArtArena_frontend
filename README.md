@@ -1,70 +1,189 @@
-# Getting Started with Create React App
+Here is a **clean, structured, professional README.md** for your **Art Arena** project.
+You can copy-paste this directly into your repository.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+---
 
-## Available Scripts
+# 🎨 Art Arena
 
-In the project directory, you can run:
+Art Arena is a real-time multiplayer drawing and word guessing game where players compete in creative battles. The game features multiple competitive and casual modes including Classic, Quick, Kids, Together, and Open Canvas.
 
-### `npm start`
+Built for fast gameplay, creativity, and competitive fun.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🚀 Features
 
-### `npm test`
+### 🎯 Classic Mode
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* Round-based gameplay
+* Score + timer system
+* One player draws, others guess
+* Points based on speed and accuracy
+* Leaderboard at the end of match
 
-### `npm run build`
+### ⚡ Quick Mode
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* Short, fast-paced rounds
+* Time-based and round-based
+* Designed for quick sessions
+* Minimal waiting time
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 🧒 Kids Mode
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+* Kid-friendly word pool
+* Easy vocabulary
+* Educational and safe
+* Score + timer based rounds
 
-### `npm run eject`
+### 🎨 Together Mode
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+* Two players draw the **same word simultaneously**
+* 5-minute drawing time
+* Side-by-side reveal at end
+* Creativity battle format
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 🖌 Open Canvas Mode
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+* Two players
+* No assigned word
+* 5-minute free drawing session
+* Pure creativity
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## 🛠 Tech Stack
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Frontend
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+* React
+* React Router
+* CSS / Custom UI
+* Socket.io (real-time communication)
 
-### Code Splitting
+### Backend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+* Node.js
+* Express.js
+* Socket.io
+* Game engine logic for rounds, timers, and matchmaking
 
-### Analyzing the Bundle Size
+Backend Repository:
+👉 [https://github.com/CodeStartAI-009/ArtArena_backend.git](https://github.com/CodeStartAI-009/ArtArena_backend.git)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## 🧠 AI Usage Disclosure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+AI tools were used during development for:
 
-### Advanced Configuration
+* Debugging backend round logic
+* Improving React component structure
+* Optimizing socket synchronization
+* Refining game mode architecture
+* Writing documentation and UI content
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+All core architecture, game mechanics, and final implementations were manually developed and reviewed.
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🎮 Game Modes Overview
 
-### `npm run build` fails to minify
+| Mode        | Rounds | Timer       | Score    | Guessing | Players |
+| ----------- | ------ | ----------- | -------- | -------- | ------- |
+| Classic     | Yes    | Yes         | Yes      | Yes      | 2+      |
+| Quick       | Yes    | Yes (short) | Yes      | Yes      | 2+      |
+| Kids        | Yes    | Yes         | Yes      | Yes      | 2+      |
+| Together    | No     | 5 min       | Optional | No       | 2       |
+| Open Canvas | No     | 5 min       | No       | No       | 2       |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+## ⚙️ Installation (Frontend)
+
+```bash
+git clone https://github.com/your-frontend-repo.git
+cd artarena
+npm install
+npm start
+```
+
+---
+
+## ⚙️ Backend Setup
+
+```bash
+git clone https://github.com/CodeStartAI-009/ArtArena_backend.git
+cd ArtArena_backend
+npm install
+npm start
+```
+
+---
+
+## 🌍 Deployment
+
+You can deploy:
+
+* Frontend → Vercel / Netlify
+* Backend → Render / Railway / VPS
+* Use environment variables for production
+
+---
+
+## 🔒 Environment Variables (Example)
+
+Frontend:
+
+```
+REACT_APP_SOCKET_URL=http://localhost:5000
+```
+
+Backend:
+
+```
+PORT=5000
+CLIENT_URL=http://localhost:3000
+```
+
+---
+
+## 🎯 Vision
+
+Art Arena aims to combine:
+
+* Competitive gameplay
+* Creative expression
+* Social interaction
+* Real-time multiplayer mechanics
+
+The goal is to evolve into a scalable multiplayer art battle platform.
+
+---
+
+## 📌 Future Improvements
+
+* Ranking system
+* Public tournaments
+* Spectator mode
+* AI moderation improvements
+* Cosmetic upgrades / skins
+* In-game rewards system
+
+---
+
+## 👨‍💻 Author
+
+Developed by Varun
+Art Arena © 2026
+
+---
+
+If you want, I can now:
+
+* Add badges (build, license, version)
+* Make it look more “startup-level professional”
+* Add screenshots section
+* Add contribution guidelines
+* Or convert it into a polished GitHub-ready markdown with emojis structured perfectly for visibility
+
+Tell me which level you want.
