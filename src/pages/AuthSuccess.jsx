@@ -9,7 +9,6 @@ export default function AuthSuccess() {
     const token = new URLSearchParams(window.location.search).get("token");
     if (!token) return navigate("/");
 
-    // 🔥 REPLACE GUEST STATE
     localStorage.setItem("artarena_token", token);
     localStorage.removeItem("guest_id");
 
