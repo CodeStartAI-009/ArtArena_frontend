@@ -176,14 +176,5 @@ The goal is to evolve into a scalable multiplayer art battle platform.
 Developed by Varun
 Art Arena © 2026
 
----
 
-If you want, I can now:
-
-* Add badges (build, license, version)
-* Make it look more “startup-level professional”
-* Add screenshots section
-* Add contribution guidelines
-* Or convert it into a polished GitHub-ready markdown with emojis structured perfectly for visibility
-
-Tell me which level you want.
+ 
