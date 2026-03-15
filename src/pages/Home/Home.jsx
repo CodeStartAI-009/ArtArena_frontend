@@ -310,11 +310,20 @@ useEffect(() => {
             <button className="howto-close" onClick={() => setShowHowTo(false)}>✕</button>
             <h2>How to Play</h2>
             <ol>
-              <li>Click <b>PLAY</b> to join a public match.</li>
-              <li>One player draws, others guess.</li>
-              <li>Correct guesses earn XP & coins.</li>
-              <li>Create private rooms with friends.</li>
-            </ol>
+  <li>Click <b>PLAY</b> to join a public match.</li>
+  <li><b>Public matches</b> use <b>Quick Play mode</b> where games start fast with random players.</li>
+  <li>One player draws while the other players try to guess the word.</li>
+  <li>Correct guesses earn <b>XP</b> and <b>coins</b>.</li>
+  <li>You can also create <b>Private Rooms</b> to play with friends.</li>
+  <li>Private rooms support four game modes: <b>Classic, Quick, Kids, and Together</b>.</li>
+  <li>In <b>Classic, Quick, and Kids</b> modes, one player draws and the others guess the word.</li>
+  <li><b>Together mode</b> has two special sub-modes:</li>
+  <ul>
+    <li><b>Drawing Mode</b> – Two players receive the same word and have <b>5 minutes</b> to draw it.</li>
+    <li><b>Open Canvas</b> – Two players can freely draw anything they want.</li>
+  </ul>
+  <li>You can use your <b>coins</b> to create or join private rooms.</li>
+</ol>
           </div>
         </div>
       )}
